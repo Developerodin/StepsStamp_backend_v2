@@ -7,5 +7,5 @@ const router = express.Router();
 
 router.post('/saveDailyPoolA', validate(poolsValidation.validatePoolA), poolsController.saveDailyPoolA);
 router.post('/saveDailyPoolB', validate(poolsValidation.validatePoolB), poolsController.saveDailyPoolB);
-
+router.post('/getDailyPooldata', poolsController.getUserActivePools);
 export default router; 

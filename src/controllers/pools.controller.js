@@ -4,6 +4,8 @@ import { savePoolEntry } from '../services/pools.service.js';
 import { getUserStepData } from '../services/fitness.service.js'; // Fetch steps from DB
 import { saveDailyReward } from '../services/poolreward.service.js';
 import { getUserWalletAndNft } from '../services/user.service.js';
+import Pool from '../models/pools.model.js';
+import moment from 'moment';
 
 const saveDailyPoolA = catchAsync(async (req, res) => {
   //const userId = req.user.id;
@@ -61,4 +63,37 @@ const saveDailyPoolB = catchAsync(async (req, res) => {
   }
 });
 
-export { saveDailyPoolA, saveDailyPoolB };
+const getUserActivePools = async (req, res) => {
+  try {
+    const { userId } = req.body;  
+    const today = moment().format('YYYY-MM-DD');  // Format date as string
+
+    // Query by userId and string date format
+    const poolEntries = await Pool.find({ 
+      userId, 
+      date: today  // Ensure you're querying with the correct format
+    });
+
+    const response = {
+      PoolA: false,
+      PoolB: false
+    };
+
+    poolEntries.forEach(entry => {
+      if (entry.poolType === 'PoolA') {
+        response.PoolA = true;
+      }
+      if (entry.poolType === 'PoolB') {
+        response.PoolB = true;
+      }
+    });
+
+    res.status(200).json(response);
+
+  } catch (error) {
+    console.error('❌ Error fetching user pool status:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export { saveDailyPoolA, saveDailyPoolB,getUserActivePools };
