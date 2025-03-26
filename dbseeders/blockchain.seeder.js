@@ -5,6 +5,7 @@ import { Faq } from '../src/models/info.model.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import config from '../src/config/config.js';
 
 const envPath = path.resolve(process.cwd(), "../.env");
 
@@ -375,7 +376,7 @@ const faqData = [
 
 
 const seedDatabase = async () => {
-  await mongoose.connect('mongodb://localhost:27017/ssb-db', {
+  await mongoose.connect(config.mongoose.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
