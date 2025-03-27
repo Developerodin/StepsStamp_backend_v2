@@ -8,6 +8,7 @@ import fitnessRoute from './fitness.route.js';
 import pools from "./pools.route.js";
 import info from "./info.route.js";
 import investors from "./investor.route.js";
+import mining from "./mining.route.js";
 
 const router = express.Router();
 
@@ -35,6 +36,7 @@ router.use('/info', info);
 router.use('/fitness', fitnessRoute);
 router.use('/pools', pools);
 router.use('/investors', investors);
+router.use('/mining', mining);
 
 
 defaultRoutes.forEach((route) => {
