@@ -50,7 +50,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   console.log("✅ Password matches. Generating JWT...");
 
   // Generate JWT token
-  const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const token = jwt.sign({ userId: user._id, email: user.email,role:"user" }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
   console.log("🔑 JWT Generated:", token);  // Debugging log
 
