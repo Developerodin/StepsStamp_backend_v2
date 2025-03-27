@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+
 const authMiddleware = (requiredRole = null) => async (req, res, next) => {
     try {
       const authHeader = req.headers.authorization;
