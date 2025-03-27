@@ -24,7 +24,7 @@ router.post('/login', validate(userValidation.login), userController.loginUser);
 
 router.get('/all-users', userController.getAllUsers);
 
-router.get('/get-user/:userId',authMiddleware('admin'),validate(userValidation.getUser) ,userController.getUser);
+router.get('/get-user/:userId',authMiddleware(),validate(userValidation.getUser) ,userController.getUser);
 
 router.get('/active-blockchain/:userId',authMiddleware(),validate(userValidation.getUser) ,userController.getActiveBlockchain);
 
