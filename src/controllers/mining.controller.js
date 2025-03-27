@@ -21,21 +21,7 @@ const getGlobalMiningStatus = catchAsync(async (req, res) => {
 const updateGlobalMiningStatus = catchAsync(async (req, res) => {
   const { freeMining, blockchainMining } = req.body;
 
-  // Ensure only one of freeMining or blockchainMining is true
-  if (freeMining && blockchainMining) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      success: false,
-      message: 'Only one of freeMining or blockchainMining can be true at a time.',
-    });
-  }
-
-  // Ensure at least one of freeMining or blockchainMining is true
-  if (!freeMining && !blockchainMining) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      success: false,
-      message: 'At least one of freeMining or blockchainMining must be true.',
-    });
-  }
+ 
 
   // Update or create the single global document
   const updatedMiningStatus = await Mining.findOneAndUpdate(
