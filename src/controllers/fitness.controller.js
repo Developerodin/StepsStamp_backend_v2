@@ -92,6 +92,59 @@ const generateEmptyWeekStatus = () => {
   }
 };
 
+ const getUserStepStats = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Get user fitness data
+    const userFitness = await UserFitness.findOne({ userId });
+
+    if (!userFitness) {
+      return res.status(404).json({ message: 'User fitness data not found' });
+    }
+
+    // console.log("User fitness data ===>", userFitness);
+
+    const stepHistory = userFitness.stepHistory || new Map();
+    const historyEntries = Array.from(stepHistory.entries());
+
+    // Sort by date in ascending order
+    historyEntries.sort(([dateA], [dateB]) => moment(dateA, 'DD/MM/YY').valueOf() - moment(dateB, 'DD/MM/YY').valueOf());
+
+    let currentStreak = 0;
+    let maxStreak = 0;
+    let totalSteps = 0;
+
+    // Loop through each day in step history
+    for (const [date, steps] of historyEntries) {
+      const totalWalkingSteps = steps.reduce((acc, entry) => acc + (entry.walkingSteps || 0), 0);
+      const totalRewardSteps = steps.reduce((acc, entry) => acc + (entry.rewardSteps || 0), 0);
+      const dailyTotalSteps = totalWalkingSteps + totalRewardSteps;
+
+      // Add to total steps
+      totalSteps += dailyTotalSteps;
+
+      // Check if the goal (10,000 steps) is met
+      if (dailyTotalSteps >= 10000) {
+        currentStreak++;
+        maxStreak = Math.max(maxStreak, currentStreak);  // Track the longest streak
+      } else {
+        currentStreak = 0;  // Reset the streak if goal is not met
+      }
+    }
+
+    res.status(200).json({
+      userId,
+      totalSteps,
+      currentStreak,
+      maxStreak
+    });
+
+  } catch (error) {
+    console.error('Error getting user step stats:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 
-export { updateSteps, getSteps, getAnalysis,getWeeklyStepGoalStatus };
+export { updateSteps, getSteps, getAnalysis,getWeeklyStepGoalStatus,getUserStepStats };

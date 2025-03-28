@@ -12,4 +12,5 @@ router.get('/analysis/:userId', validate(fitnessValidation.analysis), fitnessCon
 router.post('/updateSteps',authMiddleware(), validate(fitnessValidation.updateSteps), fitnessController.updateSteps);
 router.post('/getSteps',authMiddleware(), validate(fitnessValidation.getSteps), fitnessController.getSteps);
 router.get('/weekly-goal/:userId',authMiddleware(), fitnessController.getWeeklyStepGoalStatus);
+router.get('/user/:userId/step-stats',authMiddleware(), fitnessController.getUserStepStats);
 export default router;
