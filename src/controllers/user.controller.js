@@ -1,4 +1,5 @@
 import httpStatus from 'http-status';
+import jwt from 'jsonwebtoken';
 import catchAsync from '../utils/catchAsync.js';
 import { sendOtp,sendOtp2, verifyOtp, verifyResetOtp, loginUserWithEmailAndPassword, loginUserWithGoogle, getUserByEmail } from '../services/auth.service.js';
 
@@ -192,9 +193,11 @@ const registerUser = catchAsync(async (req, res) => {
   if (user.referredBy) {
     referredByUser = await getUserByReferredby(user.referredBy);
   }
+  const regToken = jwt.sign({ userId: user._id, email: user.email,role:"user" }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
   res.status(httpStatus.CREATED).json({
     user,
+    regToken,
     referredBy: referredByUser ? {
       _id: referredByUser._id,
       name: referredByUser.name,
