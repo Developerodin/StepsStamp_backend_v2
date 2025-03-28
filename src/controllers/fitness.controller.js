@@ -4,6 +4,7 @@ import { updateStepHistory, getUserStepData } from '../services/fitness.service.
 import UserFitness from '../models/userFitness.mode.js';
 import moment from 'moment';
 
+
 /**
  * API to update user's step count
  */
@@ -146,5 +147,70 @@ const generateEmptyWeekStatus = () => {
   }
 };
 
+const getUserLastNDaysData = async (req, res) => {
+  try {
+    const { userId,days } = req.body;
+ 
 
-export { updateSteps, getSteps, getAnalysis,getWeeklyStepGoalStatus,getUserStepStats };
+    if (!userId) {
+      return res.status(400).json({ message: 'Invalid User ID' });
+    }
+
+    const numberOfDays = parseInt(days, 10);
+    if (isNaN(numberOfDays) || numberOfDays <= 0) {
+      return res.status(400).json({ message: 'Invalid number of days' });
+    }
+
+    const today = moment().startOf('day');
+    const startDate = moment(today).subtract(numberOfDays - 1, 'days');
+
+    const userFitness = await UserFitness.findOne({ userId });
+
+    if (!userFitness) {
+      return res.status(404).json({ message: 'User fitness data not found' });
+    }
+
+    const stepHistory = userFitness.stepHistory || {};
+    
+    const stepData = [];
+    
+    // Loop through the last N days
+    for (let i = 0; i < numberOfDays; i++) {
+      const date = moment(startDate).add(i, 'days').format('DD/MM/YY');
+      
+      if (stepHistory.has(date)) {
+        const dayData = stepHistory.get(date);
+        
+        const totalWalkingSteps = dayData.reduce((acc, record) => acc + record.walkingSteps, 0);
+        const totalRewardSteps = dayData.reduce((acc, record) => acc + record.rewardSteps, 0);
+        
+        stepData.push({
+          date,
+          walkingSteps: totalWalkingSteps,
+          rewardSteps: totalRewardSteps,
+          totalSteps: totalWalkingSteps + totalRewardSteps,
+        });
+      } else {
+        // If no data for this day, return 0 steps
+        stepData.push({
+          date,
+          walkingSteps: 0,
+          rewardSteps: 0,
+          totalSteps: 0,
+        });
+      }
+    }
+
+    res.status(200).json({
+      userId,
+      days: numberOfDays,
+      stepData,
+    });
+  } catch (error) {
+    console.error('Error fetching last N days data:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+export { updateSteps, getSteps, getAnalysis,getWeeklyStepGoalStatus,getUserStepStats,getUserLastNDaysData };
