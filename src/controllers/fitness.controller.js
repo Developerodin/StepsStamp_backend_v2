@@ -1,6 +1,8 @@
 import httpStatus from 'http-status';
 import catchAsync from '../utils/catchAsync.js';
 import { updateStepHistory, getUserStepData } from '../services/fitness.service.js';
+import UserFitness from '../models/userFitness.mode.js';
+import moment from 'moment';
 
 /**
  * API to update user's step count
@@ -25,4 +27,71 @@ const getAnalysis = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json({"stepData":"ss"});
 })
 
-export { updateSteps, getSteps, getAnalysis };
+const generateEmptyWeekStatus = () => {
+  return {
+    Monday: false,
+    Tuesday: false,
+    Wednesday: false,
+    Thursday: false,
+    Friday: false,
+    Saturday: false,
+    Sunday: false,
+  };
+}
+
+ const getWeeklyStepGoalStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const today = moment().startOf('day');
+    const weekStart = moment(today).startOf('isoWeek');  // Monday as the start of the week
+
+    // Get user fitness data
+    const userFitness = await UserFitness.findOne({
+      userId,
+      monthYear: moment().format('YYYY-MM')
+    });
+
+    if (!userFitness) {
+      return res.status(404).json({ message: 'User fitness data not found' });
+    }
+
+    // console.log("User fitness data ===>", userFitness);
+
+    const weeklyGoalStatus = {};
+    const stepHistory = userFitness.stepHistory || new Map();
+
+    // Loop through each day of the current week (Monday to Sunday)
+    for (let i = 0; i < 7; i++) {
+      const currentDate = moment(weekStart).add(i, 'days').format('DD/MM/YY');
+      const dayName = moment(weekStart).add(i, 'days').format('dddd');  // Get day name (Monday, Tuesday, etc.)
+
+      if (stepHistory.has(currentDate)) {
+        // Get all step entries for the day
+        const dailySteps = stepHistory.get(currentDate);
+        
+        // Sum all walking and reward steps for the day
+        const totalWalkingSteps = dailySteps.reduce((acc, entry) => acc + (entry.walkingSteps || 0), 0);
+        const totalRewardSteps = dailySteps.reduce((acc, entry) => acc + (entry.rewardSteps || 0), 0);
+        const totalSteps = totalWalkingSteps + totalRewardSteps;
+
+        // Set true if the total steps >= 10,000
+        weeklyGoalStatus[dayName] = totalSteps >= 10000;
+      } else {
+        weeklyGoalStatus[dayName] = false;  // If no data for that day
+      }
+    }
+
+    return res.status(200).json({
+      userId,
+      weeklyGoalStatus,
+    });
+
+  } catch (error) {
+    console.error('Error getting weekly step goal status:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+export { updateSteps, getSteps, getAnalysis,getWeeklyStepGoalStatus };
