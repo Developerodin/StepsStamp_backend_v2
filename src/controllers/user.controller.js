@@ -12,6 +12,7 @@ import { OAuth2Client } from 'google-auth-library';
 
 
 import mongoose from 'mongoose';
+import User from '../models/user.model.js';
 
 
 // Google OAuth Client (Replace with your Google Client ID)
@@ -340,5 +341,70 @@ const activateBlockchain= catchAsync(async (req, res) => {
   }
 })
 
+const toggleMiningStatus = async (req, res) => {
+  try {
+    const { userId, type, status } = req.body;
+
+    const user = await User.findOne({ userId });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update Free Mining status
+    if (type === 'free') {
+      user.freeMiningActivate = status;
+
+      // Set the date only when activating
+      if (status === true) {
+        user.freeMiningActivateDate = new Date();
+      }
+    }
+
+    // Update Blockchain Mining status
+    if (type === 'blockchain') {
+      user.blockchainMiningActivate = status;
+
+      // Set the date only when activating
+      if (status === true) {
+        user.blockchainMiningActivateDate = new Date();
+      }
+    }
+
+    await user.save();
+    res.status(200).json({ message: 'Mining status updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+const getMiningStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Fetch only the mining-related fields
+    const user = await User.findOne({ userId }).select(
+      'freeMiningActivate freeMiningActivateDate blockchainMiningActivate blockchainMiningActivateDate'
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const miningStatus = {
+      freeMiningActivate: user.freeMiningActivate,
+      freeMiningActivateDate: user.freeMiningActivateDate,
+      blockchainMiningActivate: user.blockchainMiningActivate,
+      blockchainMiningActivateDate: user.blockchainMiningActivateDate,
+    };
+
+    res.status(200).json(miningStatus);
+  } catch (error) {
+    console.error('Error fetching mining status:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
 export { verifyOtpController, getWatchesByUserId,
-   activateBlockchain, getUserByRefferalCode, getActiveBlockchain, getUser, deleteAccount, checkUsername, getFollowers, getAllUsers, googleLogin, test, updateUserWallet, updateUser, verifyResetOtpController, resetUserPassword, forgotPassword, registerUser, loginUser, checkEmail };
+   activateBlockchain, getUserByRefferalCode, getActiveBlockchain, getUser, deleteAccount, checkUsername, getFollowers, getAllUsers, googleLogin, test, updateUserWallet, updateUser, verifyResetOtpController, resetUserPassword, forgotPassword, registerUser, loginUser, checkEmail
+  ,toggleMiningStatus,getMiningStatus
+  };

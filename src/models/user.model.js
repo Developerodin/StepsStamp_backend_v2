@@ -90,6 +90,13 @@ const userSchema = new mongoose.Schema(
 
     // NFT details of active blockchain
     nftAddress: { type: String, default: null, trim: true },
+
+       // New Fields
+       freeMiningActivate: { type: Boolean, default: false },
+       freeMiningActivateDate: { type: Date, default: null },  // Holds only last `true` date
+   
+       blockchainMiningActivate: { type: Boolean, default: false },
+       blockchainMiningActivateDate: { type: Date, default: null },  // Holds only last `true` date
   },
   { timestamps: true }
 );

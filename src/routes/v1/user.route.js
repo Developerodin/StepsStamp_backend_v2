@@ -57,5 +57,9 @@ router.get('/user-by-refferal-code/:refferalCode',authMiddleware(), validate(use
 //get watches by userID
 router.get('/watches/:decentralizedWalletAddress',authMiddleware(), validate(userValidation.getWatches), userController.getWatchesByUserId);
 
+router.post('/toggle-mining-status',authMiddleware(), userController.toggleMiningStatus);
+
+// Route to get mining status by userId
+router.get('/:userId/mining-details',authMiddleware(), userController.getMiningStatus);
 
 export default router;
