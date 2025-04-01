@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../utils/catchAsync.js';
 import { updateStepHistory, getUserStepData } from '../services/fitness.service.js';
 import UserFitness from '../models/userFitness.mode.js';
+import TransactionHistory from '../models/transactions.model.js';
 import moment from 'moment';
 
 
@@ -212,5 +213,86 @@ const getUserLastNDaysData = async (req, res) => {
   }
 };
 
+const getWeeklyDayWiseData = async (req, res) => {
+  try {
+    const { userId } = req.body;
 
-export { updateSteps, getSteps, getAnalysis,getWeeklyStepGoalStatus,getUserStepStats,getUserLastNDaysData };
+    if (!userId) {
+      return res.status(400).json({ message: 'Invalid User ID' });
+    }
+
+    const today = moment().startOf('day');
+    const weekStart = moment(today).startOf('isoWeek'); // Start of the week (Monday)
+    const weekEnd = moment(weekStart).endOf('isoWeek'); // End of the week (Sunday)
+
+    // Fetch user fitness data
+    const userFitness = await UserFitness.findOne({ userId });
+
+    if (!userFitness) {
+      return res.status(404).json({ message: 'User fitness data not found' });
+    }
+
+    const stepHistory = userFitness.stepHistory || new Map();
+
+    // Initialize day-wise data
+    const dayWiseData = {
+      Monday: { rewardSteps: 0, poolAReward: 0, poolBReward: 0 },
+      Tuesday: { rewardSteps: 0, poolAReward: 0, poolBReward: 0 },
+      Wednesday: { rewardSteps: 0, poolAReward: 0, poolBReward: 0 },
+      Thursday: { rewardSteps: 0, poolAReward: 0, poolBReward: 0 },
+      Friday: { rewardSteps: 0, poolAReward: 0, poolBReward: 0 },
+      Saturday: { rewardSteps: 0, poolAReward: 0, poolBReward: 0 },
+      Sunday: { rewardSteps: 0, poolAReward: 0, poolBReward: 0 },
+    };
+
+    // Fetch Pool A and Pool B rewards from TransactionHistory
+    const rewards = await TransactionHistory.find({
+      userId,
+      transactionType: { $in: ['pool_A_reward', 'pool_B_reward'] },
+      timestamp: { $gte: weekStart.toDate(), $lte: weekEnd.toDate() },
+    }).lean();
+
+    // Loop through each day of the current week (Monday to Sunday)
+    for (let i = 0; i < 7; i++) {
+      const currentDate = moment(weekStart).add(i, 'days').format('DD/MM/YY');
+      const dayName = moment(weekStart).add(i, 'days').format('dddd'); // Get day name (Monday, Tuesday, etc.)
+
+      // Get step data for the day
+      if (stepHistory.has(currentDate)) {
+        const dayData = stepHistory.get(currentDate);
+
+        // Sum up reward steps for the day
+        const totalRewardSteps = dayData.reduce((acc, record) => acc + (record.rewardSteps || 0), 0);
+
+        // Update reward steps in day-wise data
+        dayWiseData[dayName].rewardSteps += totalRewardSteps;
+      }
+
+      // Get Pool A and Pool B rewards for the day
+      rewards.forEach((reward) => {
+        if (moment(reward.timestamp).format('DD/MM/YY') === currentDate) {
+          if (reward.transactionType === 'pool_A_reward') {
+            dayWiseData[dayName].poolAReward += reward.amount;
+          } else if (reward.transactionType === 'pool_B_reward') {
+            dayWiseData[dayName].poolBReward += reward.amount;
+          }
+        }
+      });
+    }
+
+    res.status(200).json({
+      userId,
+      weekStart: weekStart.format('DD/MM/YY'),
+      weekEnd: weekEnd.format('DD/MM/YY'),
+      dayWiseData,
+    });
+  } catch (error) {
+    console.error('Error fetching weekly day-wise data:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+
+
+export { updateSteps, getSteps, getAnalysis,getWeeklyStepGoalStatus,getUserStepStats,getUserLastNDaysData ,getWeeklyDayWiseData };
