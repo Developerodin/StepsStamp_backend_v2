@@ -3,11 +3,13 @@ import jwt from 'jsonwebtoken';
 import catchAsync from '../utils/catchAsync.js';
 import { sendOtp,sendOtp2, verifyOtp, verifyResetOtp, loginUserWithEmailAndPassword, loginUserWithGoogle, getUserByEmail } from '../services/auth.service.js';
 
+
 import { createUser, completeRegistration, deleteUser, 
   activateBlockchainService, getFollowersService, getUserByReferredby, 
   getAllUsersService, resetPassword, getUserByUsername, 
   userByRefferalCode, updateUserById, getUserById, getUsersBlockchain, getUserWatches } from '../services/user.service.js';
 import { OAuth2Client } from 'google-auth-library';
+import Notifications from '../models/notifications.model.js';
 
 
 
@@ -190,6 +192,15 @@ const registerUser = catchAsync(async (req, res) => {
   }
 
   const user = await completeRegistration(req.body);
+  await Notifications.create({
+    userId: user._id,
+    emailNotification: false,
+    earningNotification: false,
+    poolNotification: false,
+    achievementNotification: false,
+    goalCompleteNotification: false,
+  });
+
   let referredByUser = null;
   if (user.referredBy) {
     referredByUser = await getUserByReferredby(user.referredBy);

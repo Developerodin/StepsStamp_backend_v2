@@ -9,6 +9,7 @@ import UserFitness from './userFitness.model.js';
 import Purchase from './purchase.model.js';
 import { UserRating, Faq, Info, Notification }  from './info.model.js';
 import Mining from './mining.model.js';
+import Notifications from './notifications.model.js';
 
 export {
   Token,
@@ -21,5 +22,6 @@ export {
   UserFitness,
   Purchase,
   UserRating, Faq, Info, Notification,
-  Mining
+  Mining,
+  Notifications,
 };
