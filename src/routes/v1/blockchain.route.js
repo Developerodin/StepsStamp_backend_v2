@@ -39,6 +39,7 @@ router.get('/transactions/user/:userId', validate(transactionValidation.getByUse
 
 // 🚀 Fetch transactions by userId and type
 router.get('/transactions/user/:userId/type/:transactionType', validate(transactionValidation.getByUserAndType), transactionController.getTransactionsByUserAndType);
+router.post('/transactions/user/lastNDays', transactionController.getLastNDaysRewards);
 
 
 
