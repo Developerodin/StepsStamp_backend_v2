@@ -121,7 +121,7 @@ const generateEmptyWeekStatus = () => {
     for (const [date, steps] of historyEntries) {
       const totalWalkingSteps = steps.reduce((acc, entry) => acc + (entry.walkingSteps || 0), 0);
       const totalRewardSteps = steps.reduce((acc, entry) => acc + (entry.rewardSteps || 0), 0);
-      const dailyTotalSteps = totalWalkingSteps + totalRewardSteps;
+      const dailyTotalSteps = totalRewardSteps;
 
       // Add to total steps
       totalSteps += dailyTotalSteps;
