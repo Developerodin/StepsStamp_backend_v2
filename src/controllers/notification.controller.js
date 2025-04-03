@@ -1,6 +1,7 @@
 import httpStatus from 'http-status';
 import catchAsync from '../utils/catchAsync.js';
 import Notifications from '../models/notifications.model.js';
+import mongoose from 'mongoose';
 
 /**
  * Fetch all notifications for a user
@@ -27,8 +28,8 @@ const getNotifications = catchAsync(async (req, res) => {
 const updateNotifications = catchAsync(async (req, res) => {
   const { userId, updates } = req.body;
 
-  if (!userId || !updates) {
-    return res.status(httpStatus.BAD_REQUEST).json({ message: 'Invalid User ID or updates' });
+  if (!userId || !mongoose.isValidObjectId(userId)) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: 'Invalid or missing User ID' });
   }
 
   const validFields = [
