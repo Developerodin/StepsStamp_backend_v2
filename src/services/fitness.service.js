@@ -81,9 +81,10 @@ const getUserStepData = async (userId, date, monthYear) => {
 //   return { message: 'Steps updated successfully' };
 // };
 
+
 const updateStepHistory = async (walkingSteps, rewardSteps, source, userId) => {
-  const currentDate = moment().format('DD/MM/YY'); // e.g., "26/03/25"
-  const currentMonth = moment().format('YYYY-MM'); // e.g., "2025-03"
+  const currentDate = moment().format('DD/MM/YY'); // e.g. "05/04/25"
+  const currentMonth = moment().format('YYYY-MM'); // e.g. "2025-04"
 
   let userFitness = await UserFitness.findOne({ userId, monthYear: currentMonth });
 
@@ -95,41 +96,36 @@ const updateStepHistory = async (walkingSteps, rewardSteps, source, userId) => {
       dailyRewardSteps: 0,
       stepHistory: {},
     });
+    await userFitness.save();
   }
 
-  // Initialize the date's array if it doesn't exist
-  if (!userFitness.stepHistory.has(currentDate)) {
-    userFitness.stepHistory.set(currentDate, [{
-      walkingSteps,
-      rewardSteps,
-      timestamp: new Date(),
-    }]);
+  const stepEntry = {
+    timestamp: new Date(),
+    walkingSteps,
+    rewardSteps,
+  };
+
+  // If date key already exists in stepHistory, update index 0 entry
+  const existingDateEntry = userFitness.stepHistory.get(currentDate);
+
+  if (existingDateEntry && existingDateEntry.length > 0) {
+    // Update the first entry
+    userFitness.stepHistory.set(currentDate, [stepEntry]);
   } else {
-    // Update the first object inside the array for the day
-    const existingArray = userFitness.stepHistory.get(currentDate);
-    if (existingArray && existingArray.length > 0) {
-      existingArray[0].walkingSteps = walkingSteps;
-      existingArray[0].rewardSteps = rewardSteps;
-      existingArray[0].timestamp = new Date();
-      userFitness.stepHistory.set(currentDate, existingArray);
-    } else {
-      userFitness.stepHistory.set(currentDate, [{
-        walkingSteps,
-        rewardSteps,
-        timestamp: new Date(),
-      }]);
-    }
+    // New date, set with one step entry
+    userFitness.stepHistory.set(currentDate, [stepEntry]);
   }
 
-  // Update daily summary
+  // Update daily totals and save
   userFitness.dailyWalkingSteps = walkingSteps;
   userFitness.dailyRewardSteps = rewardSteps;
   userFitness.lastStepUpdate = new Date();
   userFitness.fitnessSource = source;
-
   await userFitness.save();
 
-  return { message: 'Steps updated successfully' };
+  return { message: 'Steps updated successfully (single entry per date)' };
 };
+
+
 
 export { updateStepHistory, getUserStepData };
