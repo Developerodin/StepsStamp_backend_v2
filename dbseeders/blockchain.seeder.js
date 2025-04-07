@@ -22,11 +22,11 @@ const blockchainData = [
       { name: "micro", blocks: 75 }
     ],
     phaseWiseBonuses: [
-      { phaseName: "A", phaseBonus: 40000, investorBonus: { days: 30, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 1000 },
-      { phaseName: "B", phaseBonus: 30000, investorBonus: { days: 30, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 2000 },
-      { phaseName: "C", phaseBonus: 20000, investorBonus: { days: 30, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 3000 },
-      { phaseName: "D", phaseBonus: 15000, investorBonus: { days: 30, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 4000 },
-      { phaseName: "E", phaseBonus: 10000, investorBonus: { days: 30, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 5000 }
+      { phaseName: "A", phaseBonus: 60000, investorBonus: { days: 60, dailyBonusToken: 1000 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 0 },
+      { phaseName: "B", phaseBonus: 50000, investorBonus: { days: 50, dailyBonusToken: 750 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 1000 },
+      { phaseName: "C", phaseBonus: 30000, investorBonus: { days: 40, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 1000 },
+      { phaseName: "D", phaseBonus: 20000, investorBonus: { days: 35, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 1000 },
+      { phaseName: "E", phaseBonus: 10000, investorBonus: { days: 30, dailyBonusToken: 500 }, watchBonus: { days: 730, dailyBonusToken: 100 }, totalWithdrawalLimit: 1000 }
     ],
     dailyMineCap: 2299,
     contractAddress: "0x123456789abcdef",
@@ -69,11 +69,11 @@ const blockchainData = [
       { name: "micro", blocks: 75 }
     ],
     phaseWiseBonuses: [
-      { phaseName: "A", phaseBonus: 20000, investorBonus: { days: 30, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 500 },
-      { phaseName: "B", phaseBonus: 15000, investorBonus: { days: 30, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 1000 },
-      { phaseName: "C", phaseBonus: 10000, investorBonus: { days: 30, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 1500 },
-      { phaseName: "D", phaseBonus: 7500, investorBonus: { days: 30, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 2000 },
-      { phaseName: "E", phaseBonus: 10000, investorBonus: { days: 30, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 2500 }
+      { phaseName: "A", phaseBonus: 30000, investorBonus: { days: 60, dailyBonusToken: 350 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 0 },
+      { phaseName: "B", phaseBonus: 25000, investorBonus: { days: 50, dailyBonusToken: 275 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 500 },
+      { phaseName: "C", phaseBonus: 15000, investorBonus: { days: 40, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 500 },
+      { phaseName: "D", phaseBonus: 10000, investorBonus: { days: 35, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 500 },
+      { phaseName: "E", phaseBonus: 5000, investorBonus: { days: 30, dailyBonusToken: 167 }, watchBonus: { days: 450, dailyBonusToken: 50 }, totalWithdrawalLimit: 500 }
     ],
     nftAddress:process.env.GOLD_NFT,
     dailyMineCap: 1919,
@@ -93,11 +93,11 @@ const blockchainData = [
       { name: "micro", blocks: 75 }
     ],
     phaseWiseBonuses: [
-      { phaseName: "A", phaseBonus: 4000, investorBonus: { days: 30, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 100 },
-      { phaseName: "B", phaseBonus: 3000, investorBonus: { days: 30, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 200 },
-      { phaseName: "C", phaseBonus: 2000, investorBonus: { days: 30, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 300 },
-      { phaseName: "D", phaseBonus: 1500, investorBonus: { days: 30, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 400 },
-      { phaseName: "E", phaseBonus: 1000, investorBonus: { days: 30, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 500 }
+      { phaseName: "A", phaseBonus: 6000, investorBonus: { days: 60, dailyBonusToken: 35 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 0 },
+      { phaseName: "B", phaseBonus: 5000, investorBonus: { days: 50, dailyBonusToken: 25 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 100 },
+      { phaseName: "C", phaseBonus: 3000, investorBonus: { days: 40, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 100 },
+      { phaseName: "D", phaseBonus: 2000, investorBonus: { days: 35, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 100 },
+      { phaseName: "E", phaseBonus: 1000, investorBonus: { days: 30, dailyBonusToken: 16 }, watchBonus: { days: 300, dailyBonusToken: 10 }, totalWithdrawalLimit: 100 }
     ],
     dailyMineCap: 1534,
     nftAddress:process.env.SILVER_NFT,
@@ -140,11 +140,11 @@ const blockchainData = [
       { name: "micro", blocks: 75 }
     ],
     phaseWiseBonuses: [
-      { phaseName: "A", phaseBonus: 2000, investorBonus: { days: 30, dailyBonusToken: 5 }, totalWithdrawalLimit: 50 },
-      { phaseName: "B", phaseBonus: 1500, investorBonus: { days: 30, dailyBonusToken: 5 }, totalWithdrawalLimit: 100 },
-      { phaseName: "C", phaseBonus: 1000, investorBonus: { days: 30, dailyBonusToken: 5 }, totalWithdrawalLimit: 150 },
-      { phaseName: "D", phaseBonus: 750, investorBonus: { days: 30, dailyBonusToken: 5 }, totalWithdrawalLimit: 300 },
-      { phaseName: "E", phaseBonus: 500, investorBonus: { days: 30, dailyBonusToken: 5 }, totalWithdrawalLimit: 250 }
+      { phaseName: "A", phaseBonus: 3000, investorBonus: { days: 60, dailyBonusToken: 10 }, totalWithdrawalLimit: 0 },
+      { phaseName: "B", phaseBonus: 2500, investorBonus: { days: 50, dailyBonusToken: 7.5 }, totalWithdrawalLimit: 50 },
+      { phaseName: "C", phaseBonus: 1500, investorBonus: { days: 40, dailyBonusToken: 5 }, totalWithdrawalLimit: 50 },
+      { phaseName: "D", phaseBonus: 1000, investorBonus: { days: 35, dailyBonusToken: 5 }, totalWithdrawalLimit: 50 },
+      { phaseName: "E", phaseBonus: 500, investorBonus: { days: 30, dailyBonusToken: 5 }, totalWithdrawalLimit: 50 }
     ],
     nftAddress:process.env.BLACK_NFT,
     dailyMineCap: 1150,
@@ -186,11 +186,11 @@ const blockchainData = [
       { name: "micro", blocks: 75 }
     ],
     phaseWiseBonuses: [
-      { phaseName: "A", phaseBonus: 400, investorBonus: { days: 30, dailyBonusToken: 1 }, totalWithdrawalLimit: 10 },
-      { phaseName: "B", phaseBonus: 300, investorBonus: { days: 30, dailyBonusToken: 1 }, totalWithdrawalLimit: 20 },
-      { phaseName: "C", phaseBonus: 200, investorBonus: { days: 30, dailyBonusToken: 1 }, totalWithdrawalLimit: 30 },
-      { phaseName: "D", phaseBonus: 150, investorBonus: { days: 30, dailyBonusToken: 1 }, totalWithdrawalLimit: 40 },
-      { phaseName: "E", phaseBonus: 100, investorBonus: { days: 30, dailyBonusToken: 1 }, totalWithdrawalLimit: 50 }
+      { phaseName: "A", phaseBonus: 600, investorBonus: { days: 60, dailyBonusToken: 2 }, totalWithdrawalLimit: 0 },
+      { phaseName: "B", phaseBonus: 500, investorBonus: { days: 50, dailyBonusToken: 1.5 }, totalWithdrawalLimit: 10 },
+      { phaseName: "C", phaseBonus: 300, investorBonus: { days: 40, dailyBonusToken: 1 }, totalWithdrawalLimit: 10 },
+      { phaseName: "D", phaseBonus: 200, investorBonus: { days: 35, dailyBonusToken: 1 }, totalWithdrawalLimit: 10 },
+      { phaseName: "E", phaseBonus: 100, investorBonus: { days: 30, dailyBonusToken: 1 }, totalWithdrawalLimit: 10 }
     ],
     nftAddress:process.env.WHITE_NFT,
     dailyMineCap: 767,
