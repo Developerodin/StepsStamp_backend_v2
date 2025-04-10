@@ -5,6 +5,7 @@ import { getUserStepData } from '../services/fitness.service.js'; // Fetch steps
 import { saveDailyReward } from '../services/poolreward.service.js';
 import { getUserWalletAndNft } from '../services/user.service.js';
 import Pool from '../models/pools.model.js';
+import User from '../models/user.model.js';
 import moment from 'moment';
 
 const saveDailyPoolA = catchAsync(async (req, res) => {
@@ -96,4 +97,56 @@ const getUserActivePools = async (req, res) => {
   }
 };
 
-export { saveDailyPoolA, saveDailyPoolB,getUserActivePools };
+/**
+ * Get all users with their activated pools (historical data with activation date and time, and user name)
+ */
+const getAllUsersActivatedPools = catchAsync(async (req, res) => {
+  // Query to find all pool entries
+  const poolEntries = await Pool.find().sort({ date: 1 }); // Sort by date to get the earliest activation date
+
+  // Create a response object to group users by their activated pools
+  const userPools = {};
+
+  poolEntries.forEach((entry) => {
+    const userId = entry.userId.toString();
+
+    if (!userPools[userId]) {
+      userPools[userId] = {
+        userId,
+        name: null, // Placeholder for the user's name
+        PoolA: { activated: false, dateTime: null },
+        PoolB: { activated: false, dateTime: null },
+      };
+    }
+
+    if (entry.poolType === 'PoolA' && !userPools[userId].PoolA.activated) {
+      userPools[userId].PoolA.activated = true;
+      userPools[userId].PoolA.dateTime = entry.date; // Store the activation date and time
+    }
+
+    if (entry.poolType === 'PoolB' && !userPools[userId].PoolB.activated) {
+      userPools[userId].PoolB.activated = true;
+      userPools[userId].PoolB.dateTime = entry.date; // Store the activation date and time
+    }
+  });
+
+  // Fetch user details (names) for all userIds
+  const userIds = Object.keys(userPools);
+  const users = await User.find({ _id: { $in: userIds } }).select('_id name'); // Fetch userId and name
+
+  // Map user names to the response
+  users.forEach((user) => {
+    if (userPools[user._id.toString()]) {
+      userPools[user._id.toString()].name = user.name;
+    }
+  });
+
+  // Convert the object to an array for the response
+  const response = Object.values(userPools);
+
+  res.status(httpStatus.OK).json({ success: true, data: response });
+});
+
+
+
+export { saveDailyPoolA, saveDailyPoolB,getUserActivePools ,getAllUsersActivatedPools };

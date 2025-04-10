@@ -3,6 +3,7 @@ import catchAsync from '../utils/catchAsync.js';
 import transactionService from '../services/transaction.service.js';
 import { distributeBonusForAllNFTs, distribute50kDailyRewards } from '../services/cronJobs/50kDistributation.service.js';
 import TransactionHistory from '../models/transactions.model.js';
+import { Blockchain } from '../models/blockchain.model.js';
 import moment from 'moment';
 
 const getAllTransactions = catchAsync(async (req, res) => {
@@ -52,8 +53,8 @@ const getLastNDaysRewards = catchAsync(async (req, res) => {
     const rewards = await TransactionHistory.find({
       userId,
       transactionType: { $in: ['pool_A_reward', 'pool_B_reward'] },
-      timestamp: { $gte: startDate.toDate(), $lte: today.toDate() },
     }).lean();
+    console.log('Rewards:', rewards);
 
     // Initialize day-wise rewards
     const rewardsData = {};
@@ -91,6 +92,79 @@ const getLastNDaysRewards = catchAsync(async (req, res) => {
 });
 
 
+const getAllUsersTransactionHistory = catchAsync(async (req, res) => {
+  try {
+    // Fetch all transactions and populate user details
+    const transactions = await TransactionHistory.find()
+      .populate({
+        path: 'userId', // Populate user details
+        select: 'name decentralizedWalletAddress', // Only fetch name and decentralizedWalletAddress
+      })
+      .sort({ timestamp: -1 }); // Sort by most recent transactions
+
+    // Format the response
+    const formattedTransactions = transactions.map((transaction) => {
+      const date = moment(transaction.timestamp).format('YYYY-MM-DD'); // Extract date
+      const time = moment(transaction.timestamp).format('HH:mm:ss'); // Extract time
+
+      return {
+        userName: transaction.userId?.name || 'Unknown User',
+        decentralizedWalletAddress: transaction.userId?.decentralizedWalletAddress || 'N/A',
+        transactionType: transaction.transactionType,
+        amount: transaction.amount,
+        date, // Include date separately
+        time, // Include time separately
+      };
+    });
+
+    res.status(httpStatus.OK).json({ success: true, data: formattedTransactions });
+  } catch (error) {
+    console.error('Error fetching all users transaction history:', error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server Error' });
+  }
+});
+
+const getAllPurchaseTransactions = catchAsync(async (req, res) => {
+  try {
+    // Fetch all purchase transactions and populate user details
+    const transactions = await TransactionHistory.find({ transactionType: 'purchase' })
+      .populate({
+        path: 'userId', // Populate user details
+        select: 'name', // Only fetch the user's name
+      })
+      .sort({ timestamp: -1 }); // Sort by most recent transactions
+
+    // Fetch blockchain names for each transaction
+    const formattedTransactions = await Promise.all(
+      transactions.map(async (transaction) => {
+        const date = moment(transaction.timestamp).format('YYYY-MM-DD'); // Extract date
+        const time = moment(transaction.timestamp).format('HH:mm:ss'); // Extract time
+
+        // Fetch blockchain name using blockchainId
+        let blockchainName = 'Unknown Blockchain';
+        if (transaction.blockchainId) {
+          const blockchain = await Blockchain.findById(transaction.blockchainId); // Fetch blockchain details
+          blockchainName = blockchain?.name || 'Unknown Blockchain';
+        }
+
+        return {
+          userName: transaction.userId?.name || 'Unknown User',
+          blockchainName, // Blockchain name fetched manually
+          amount: transaction.amount,
+          date, // Include date separately
+          time, // Include time separately
+        };
+      })
+    );
+
+    res.status(httpStatus.OK).json({ success: true, data: formattedTransactions });
+  } catch (error) {
+    console.error('Error fetching all purchase transactions:', error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server Error' });
+  }
+});
+
+
 
 
 export default {
@@ -99,5 +173,7 @@ export default {
   getTransactionsByUserAndType,
   distribute30day,
   distribute50k,
-  getLastNDaysRewards
+  getLastNDaysRewards,
+  getAllUsersTransactionHistory,
+  getAllPurchaseTransactions,
 };
