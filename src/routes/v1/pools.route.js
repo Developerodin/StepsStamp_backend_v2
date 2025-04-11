@@ -9,4 +9,5 @@ const router = express.Router();
 router.post('/saveDailyPoolA',authMiddleware(), validate(poolsValidation.validatePoolA), poolsController.saveDailyPoolA);
 router.post('/saveDailyPoolB',authMiddleware(), validate(poolsValidation.validatePoolB), poolsController.saveDailyPoolB);
 router.post('/getDailyPooldata', poolsController.getUserActivePools);
+router.get('/getAllUsersActivatedPools', poolsController.getAllUsersActivatedPools);
 export default router; 

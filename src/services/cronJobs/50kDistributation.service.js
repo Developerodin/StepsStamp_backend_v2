@@ -1,13 +1,11 @@
 import dotenv from 'dotenv';
 import Web3 from 'web3';
 import cron from 'node-cron';
-import mongoose from 'mongoose';
 import DailyReward from '../../models/dailyrewards.model.js';
 import path from 'path';
 import fs from 'fs';
 import User from "../../models/user.model.js";
 import TransactionHistory from "../../models/transactions.model.js";
-import { isArray } from 'util';
 
 dotenv.config({ path: path.resolve(process.cwd(), '../../../.env') });
 
@@ -24,11 +22,20 @@ const WEB3_PROVIDER = process.env.WEB3_PROVIDER;
 const web3 = new Web3(new Web3.providers.HttpProvider(WEB3_PROVIDER));
 
 const contractAddress = process.env.DISTRIBUTION;
+const contractAddressFK = process.env.FIFTYK_DISTRIBUTION;
+
+
+
 console.log('c address'+contractAddress);
 const formattedPrivateKey = `0x${PRIVATE_KEY}`;
+
 const ABI = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'DistributionABI.json'), 'utf-8'));
+const FIFTYK_ABI = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'fiftyKDistributionABI.json'), 'utf-8'));
 
 const contract = new web3.eth.Contract(ABI, contractAddress);
+const fiftyKContract = new web3.eth.Contract(FIFTYK_ABI, contractAddressFK);
+
+
 const account = web3.eth.accounts.privateKeyToAccount(formattedPrivateKey);
 web3.eth.accounts.wallet.add(account);
 web3.eth.defaultAccount = account.address;
@@ -182,47 +189,75 @@ function splitBatches(poolA, poolB) {
 
 //pool A & Pool B bonus
 export const distribute50kDailyRewards = async () => {
+   
     try {
        
         const poolA = await DailyReward.find({ poolType: "A" }).select("decentralizedWalletAddress");
         const poolB = await DailyReward.find({ poolType: "B" }).select("decentralizedWalletAddress");
-        
-        const poolAWallets = [...new Set(poolA.map(doc => doc.decentralizedWalletAddress))];
-        const poolBWallets = [...new Set(poolB.map(doc => doc.decentralizedWalletAddress))];
-        
+   
+        const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
+           
+        const poolAWallets = [...new Set(poolA.map(doc => doc.decentralizedWalletAddress))] .filter(addr => isValidEthAddress(addr));
        
-        console.log(`Total eligible users: Pool A - ${poolAWallets}, Pool B - ${poolBWallets}`);
+       const poolBWallets = [...new Set(poolB.map(doc => doc.decentralizedWalletAddress))] .filter(addr => isValidEthAddress(addr));;
+        
+     
+       console.log(`Total eligible users: Pool A - ${poolAWallets}, Pool B - ${poolBWallets}`);
         
         if(poolAWallets.length>0){
-        const txA = contract.methods.distribute50kDailyDistribution(poolAWallets, []);
-        
+           
+        const txA = fiftyKContract.methods.distribute50kDailyDistribution(poolAWallets,[]);
         try {
             const gas = await txA.estimateGas({ from: account.address });
-            console.log(`Estimated Gas: ${gas}`);
-            
-           const txHash = await sendTransaction(txA);
-           await getTransactionDetails(txHash,"pool_A_reward");
+            const gasPrice = await web3.eth.getGasPrice();
+            const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+            const CONTRACT_ADDRESS = process.env.FIFTYK_DISTRIBUTION;
+            const txData = {
+                from: account.address,
+                to: CONTRACT_ADDRESS,
+                gas: Number(gasLimit),
+                gasPrice,
+                data: txA.encodeABI()
+            };
+    
+            const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+            const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    
+            console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+            await getTransactionDetails(receipt.transactionHash,"pool_A_reward");
         } catch (error) {
-            console.error("Transaction Failed! Revert Reason:", error.message);
+            console.error("❌ Transaction Failed:", error.message);
         }
-        }
-
-        if(poolBWallets.length){
-        const txB = contract.methods.distribute50kDailyDistribution([], poolBWallets);
+       }
+        
+        if(poolBWallets.length>0){
+        const txB = fiftyKContract.methods.distribute50kDailyDistribution([], poolBWallets);
         try {
             const gas = await txB.estimateGas({ from: account.address });
-            console.log(`Estimated Gas: ${gas}`);
-            
-           const txHash = await sendTransaction(txB);
-           await getTransactionDetails(txHash,"pool_B_reward");
+            const gasPrice = await web3.eth.getGasPrice();
+            const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+            const CONTRACT_ADDRESS = process.env.FIFTYK_DISTRIBUTION;
+            const txData = {
+                from: account.address,
+                to: CONTRACT_ADDRESS,
+                gas: Number(gasLimit),
+                gasPrice,
+                data: txB.encodeABI()
+            };
+    
+            const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+            const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    
+            console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+            await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
         } catch (error) {
-            console.error("Transaction Failed! Revert Reason:", error.message);
+            console.error("❌ Transaction Failed:", error.message);
         }
         }
 
-    } catch (error) {
-        console.error('Error distributing daily 50k rewards:', error);
-    }
+     } catch (error) {
+         console.error('Error distributing daily 50k rewards:', error);
+     }
    
 };
 
@@ -230,7 +265,7 @@ export const distribute50kDailyRewards = async () => {
 
 cron.schedule('0 0 * * *', async() => {
   await distributeBonusForAllNFTs();
-  await distribute50kDailyDistribution();
+  await distribute50kDailyRewards();
 
   console.log("This function runs after 10 seconds.");
 
@@ -238,5 +273,6 @@ cron.schedule('0 0 * * *', async() => {
     timezone: 'Etc/UTC' // 🔥 This ensures it runs at GMT-00
   }
 ); // 10000 milliseconds = 10 seconds
+
 
 console.log('⏳ Cron job set to run daily at GMT+00.');
