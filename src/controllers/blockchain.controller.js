@@ -8,7 +8,16 @@ import * as blockchainService from '../services/blockchian.service.js';
  */
 const getAllBlockchains = catchAsync(async (req, res) => {
   const blockchains = await blockchainService.getAllBlockchains();
-  res.status(httpStatus.OK).json({ success: true, data: blockchains });
+  
+  // Define the desired order
+  const order = ['Green SS', 'Gold SS', 'Silver SS', 'Black SS', 'White SS'];
+  
+  // Sort blockchains according to the defined order
+  const sortedBlockchains = blockchains.sort((a, b) => {
+    return order.indexOf(a.name) - order.indexOf(b.name);
+  });
+  
+  res.status(httpStatus.OK).json({ success: true, data: sortedBlockchains });
 });
 
 /**

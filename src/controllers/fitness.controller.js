@@ -77,7 +77,7 @@ const generateEmptyWeekStatus = () => {
         const totalSteps = totalWalkingSteps + totalRewardSteps;
 
         // Set true if the total steps >= 10,000
-        weeklyGoalStatus[dayName] = totalSteps >= 10000;
+        weeklyGoalStatus[dayName] = totalSteps >= 1500;
       } else {
         weeklyGoalStatus[dayName] = false;  // If no data for that day
       }
@@ -127,7 +127,7 @@ const generateEmptyWeekStatus = () => {
       totalSteps += dailyTotalSteps;
 
       // Check if the goal (10,000 steps) is met
-      if (dailyTotalSteps >= 10000) {
+      if (dailyTotalSteps >= 1500) {
         currentStreak++;
         maxStreak = Math.max(maxStreak, currentStreak);  // Track the longest streak
       } else {
