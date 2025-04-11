@@ -11,6 +11,7 @@ import investors from "./investor.route.js";
 import mining from "./mining.route.js";
 import notifications from "./notifications.route.js";
 import adminRoute from './admin.route.js';
+import version from './version.route.js';
 
 const router = express.Router();
 
@@ -41,6 +42,7 @@ router.use('/investors', investors);
 router.use('/mining', mining);
 router.use('/notifications', notifications);
 router.use('/admin', adminRoute);
+router.use('/version', version);
 
 defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
