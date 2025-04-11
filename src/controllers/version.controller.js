@@ -57,6 +57,9 @@ const checkAppVersion = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).json({
       success: true,
       isMatch,
+      appLink: version.appLink,
+      updateAvailable: version.updateAvailable,
+      version: version.version,
       message: isMatch
         ? 'AppVersion matches the global version.'
         : 'AppVersion does not match the global version.',
