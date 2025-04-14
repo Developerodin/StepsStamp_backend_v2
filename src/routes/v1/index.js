@@ -12,7 +12,7 @@ import mining from "./mining.route.js";
 import notifications from "./notifications.route.js";
 import adminRoute from './admin.route.js';
 import version from './version.route.js';
-
+import chat from './chat.route.js';
 const router = express.Router();
 
 const defaultRoutes = [
@@ -43,6 +43,7 @@ router.use('/mining', mining);
 router.use('/notifications', notifications);
 router.use('/admin', adminRoute);
 router.use('/version', version);
+router.use('/chat', chat);
 
 defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
