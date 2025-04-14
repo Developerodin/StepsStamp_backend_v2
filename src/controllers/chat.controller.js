@@ -59,6 +59,7 @@ const getChatHistory = catchAsync(async (req, res) => {
     data: chatHistory,
   });
 });
+
 // Receive messages for a specific user or admin
 const receiveMessages = catchAsync(async (req, res) => {
   const { receiverId, receiverType } = req.params;
@@ -117,9 +118,58 @@ const deleteMessage = catchAsync(async (req, res) => {
   });
 });
 
+// Get all users who have initiated chats with admin
+const getUsersWithChats = catchAsync(async (req, res) => {
+  // Find all unique user IDs who have sent messages to admin
+  const usersWithChats = await Chat.aggregate([
+    {
+      $match: {
+        'sender.type': 'User',
+        'receiver.type': 'Admin'
+      }
+    },
+    {
+      $group: {
+        _id: '$sender.id',
+        lastMessage: { $last: '$message' },
+        lastMessageTime: { $last: '$createdAt' }
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'userDetails'
+      }
+    },
+    {
+      $unwind: '$userDetails'
+    },
+    {
+      $project: {
+        userId: '$_id',
+        name: '$userDetails.name',
+        email: '$userDetails.email',
+        lastMessage: 1,
+        lastMessageTime: 1
+      }
+    },
+    {
+      $sort: { lastMessageTime: -1 }
+    }
+  ]);
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    data: usersWithChats
+  });
+});
+
 export default {
   sendMessage,
   getChatHistory,
   receiveMessages,
   deleteMessage,
+  getUsersWithChats
 };
