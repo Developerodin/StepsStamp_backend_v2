@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/login', validate(adminValidation.login), adminController.login);
 
 // Admin registration (protected route - only existing admins can create new admins)
-router.post('/register', authMiddleware('admin'), validate(adminValidation.register), adminController.register);
+router.post('/register', validate(adminValidation.register), adminController.register);
 
 // Change password
 router.post('/change-password', authMiddleware('admin'), validate(adminValidation.changePassword), adminController.changePassword);

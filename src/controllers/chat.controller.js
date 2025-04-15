@@ -2,10 +2,35 @@ import httpStatus from 'http-status';
 import catchAsync from '../utils/catchAsync.js';
 import Chat from '../models/chat.model.js';
 import mongoose from 'mongoose';
+import Admin from '../models/admin.model.js';
 
 // Send a message
 const sendMessage = catchAsync(async (req, res) => {
-  const { senderId, senderType, receiverId, receiverType, message } = req.body;
+  let { senderId, senderType, receiverId, receiverType, message } = req.body;
+
+  // If receiver is admin, get admin ID from Admin model
+  if (receiverType === 'Admin') {
+    const admin = await Admin.findOne();
+    if (!admin) {
+      return res.status(httpStatus.NOT_FOUND).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+    receiverId = admin._id;
+  }
+
+  // If sender is admin, get admin ID from Admin model
+  if (senderType === 'Admin') {
+    const admin = await Admin.findOne();
+    if (!admin) {
+      return res.status(httpStatus.NOT_FOUND).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+    senderId = admin._id;
+  }
 
   const newMessage = await Chat.create({
     sender: { id: senderId, type: senderType },
@@ -22,23 +47,28 @@ const sendMessage = catchAsync(async (req, res) => {
 
 // Get chat history between a user and admin
 const getChatHistory = catchAsync(async (req, res) => {
-  const { userId, adminId } = req.body; // Accept both userId and adminId in the request body
+  const { userId } = req.body;
 
-  // Debugging logs
-  console.log('userId:', userId);
-  console.log('adminId:', adminId);
-
-  // Ensure both IDs are provided
-  if (!userId || !adminId) {
-    return res.status(httpStatus.BAD_REQUEST).json({
+  // Get the admin ID from Admin model
+  const admin = await Admin.findOne();
+  if (!admin) {
+    return res.status(httpStatus.NOT_FOUND).json({
       success: false,
-      message: 'Both userId and adminId are required to fetch chat history.',
+      message: 'Admin not found'
     });
   }
 
-  // Ensure IDs are ObjectId types
+  // Ensure userId is provided
+  if (!userId) {
+    return res.status(httpStatus.BAD_REQUEST).json({
+      success: false,
+      message: 'userId is required to fetch chat history.',
+    });
+  }
+
+  // Ensure ID is ObjectId type
   const userObjectId = mongoose.Types.ObjectId(userId);
-  const adminObjectId = mongoose.Types.ObjectId(adminId);
+  const adminObjectId = admin._id;
 
   // Fetch chat messages where the admin is either the sender or receiver
   const chatHistory = await Chat.find({
@@ -50,9 +80,6 @@ const getChatHistory = catchAsync(async (req, res) => {
     .sort({ createdAt: 1 }) // Sort messages by creation time (oldest first)
     .populate('sender.id', 'name email') // Populate sender details
     .populate('receiver.id', 'name email'); // Populate receiver details
-
-  // Debugging logs
-  console.log('chatHistory:', chatHistory);
 
   res.status(httpStatus.OK).json({
     success: true,
