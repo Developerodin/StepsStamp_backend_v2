@@ -76,7 +76,8 @@ const loginUserWithGoogle = async(email) =>{
  * Generate and send OTP to email
  */
 const sendOtp = async (email) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
+  // Special case for piyushmsoni98@gmail.com
+  const otp = email === 'piyushmsoni98@gmail.com' ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
   await Otp.create({ email, otp, expiresAt: Date.now() + 10 * 60 * 1000 }); // OTP valid for 10 mins
    // ✅ Use the built-in email service to send the OTP
    const subject = `${otp} OTP For StepsStamp Mobile App Login`;
@@ -90,7 +91,8 @@ const sendOtp = async (email) => {
 
 
 const sendOtp2 = async (email) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
+  // Special case for piyushmsoni98@gmail.com
+  const otp = email === 'piyushmsoni98@gmail.com' ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
   await Otp.create({ email, otp, expiresAt: Date.now() + 10 * 60 * 1000 }); // OTP valid for 10 mins
    // ✅ Use the built-in email service to send the OTP
    const subject = `${otp} OTP For StepsStamp Mobile App Password Reset`;
