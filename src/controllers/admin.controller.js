@@ -5,6 +5,20 @@ import catchAsync from '../utils/catchAsync.js';
 import ApiError from '../utils/ApiError.js';
 import Admin from '../models/admin.model.js';
 import User from '../models/user.model.js';
+import Notifications from '../models/notifications.model.js';
+import crypto from 'crypto';
+
+// Generate unique referral code
+const generateReferralCode = async () => {
+  let code;
+  let exists;
+  do {
+    code = crypto.randomBytes(2).toString('hex').toUpperCase(); // Generates a 4-character alphanumeric code
+    exists = await User.findOne({ referralCode: code });
+  } while (exists);
+  
+  return code;
+};
 
 // Admin login
 const login = catchAsync(async (req, res) => {
@@ -136,6 +150,83 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+// Register user by admin
+const registerUserByAdmin = catchAsync(async (req, res) => {
+  const { name, email, password, username, dateOfBirth } = req.body;
+
+  // Check if username is unique
+  const existingUser = await User.findOne({ username });
+  if (existingUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Username already taken');
+  }
+
+  // Check if email is unique
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+
+  // Check age validation
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  if (today.getMonth() < birthDate.getMonth() || 
+      (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+      age--;
+  }
+
+  if (age < 18) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'You must be at least 18 years old to register.');
+  }
+
+  // Generate unique referral code
+  const referralCode = await generateReferralCode();
+
+  // Create user
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+    username,
+    dateOfBirth,
+    isEmailVerified: true,
+    role: 'user',
+    referralCode,
+  });
+
+  // Create notifications settings
+  await Notifications.create({
+    userId: user._id,
+    emailNotification: false,
+    earningNotification: false,
+    poolNotification: false,
+    achievementNotification: false,
+    goalCompleteNotification: false,
+  });
+
+  // Generate token
+  const token = jwt.sign(
+    { userId: user._id, email: user.email, role: 'user' },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  res.status(httpStatus.CREATED).json({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      dateOfBirth: user.dateOfBirth,
+      isEmailVerified: user.isEmailVerified,
+      role: user.role,
+      referralCode: user.referralCode,
+    },
+    token,
+  });
+});
+
 export {
   login,
   register,
@@ -144,4 +235,5 @@ export {
   getUserDetails,
   updateUser,
   deleteUser,
+  registerUserByAdmin,
 }; 

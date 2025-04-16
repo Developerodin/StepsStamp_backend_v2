@@ -27,4 +27,7 @@ router.patch('/users/:userId', authMiddleware('admin'), validate(adminValidation
 // Delete user (admin only)
 router.delete('/users/:userId', authMiddleware('admin'), adminController.deleteUser);
 
+// Register user by admin (admin only)
+router.post('/register-user', authMiddleware('admin'), adminController.registerUserByAdmin);
+
 export default router; 
