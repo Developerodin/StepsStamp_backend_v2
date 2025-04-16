@@ -8,6 +8,7 @@ import moment from 'moment';
 const getUserStepData = async (userId, date, monthYear) => {
   const currentMonth = monthYear || moment().format('YYYY-MM'); // Default to current month
   const formattedDate = date ? moment(date, 'YYYY-MM-DD').format('DD/MM/YY') : null; // Ensure correct format
+  const currentDate = moment().format('DD/MM/YY'); // Get current date
 
   // Find user fitness data for the given month
   const userFitness = await UserFitness.findOne({ userId, monthYear: currentMonth }).lean(); 
@@ -24,11 +25,15 @@ const getUserStepData = async (userId, date, monthYear) => {
     };
   }
 
-  // ✅ Return entire month's step data
+  // Get current date's step data
+  const currentDateSteps = userFitness.stepHistory[currentDate] || [];
+  const currentDateData = currentDateSteps[0] || { walkingSteps: 0, rewardSteps: 0 };
+
+  // ✅ Return entire month's step data with current date's steps
   return {
     monthYear: currentMonth,
-    dailyWalkingSteps: userFitness.dailyWalkingSteps,
-    dailyRewardSteps: userFitness.dailyRewardSteps,
+    dailyWalkingSteps: currentDateData.walkingSteps,
+    dailyRewardSteps: currentDateData.rewardSteps,
     stepHistory: userFitness.stepHistory,
   };
 };
