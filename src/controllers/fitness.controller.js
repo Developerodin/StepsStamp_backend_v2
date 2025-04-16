@@ -105,8 +105,6 @@ const generateEmptyWeekStatus = () => {
       return res.status(404).json({ message: 'User fitness data not found' });
     }
 
-    // console.log("User fitness data ===>", userFitness);
-
     const stepHistory = userFitness.stepHistory || new Map();
     const historyEntries = Array.from(stepHistory.entries());
 
@@ -116,6 +114,7 @@ const generateEmptyWeekStatus = () => {
     let currentStreak = 0;
     let maxStreak = 0;
     let totalSteps = 0;
+    let lastDate = null;
 
     // Loop through each day in step history
     for (const [date, steps] of historyEntries) {
@@ -126,13 +125,22 @@ const generateEmptyWeekStatus = () => {
       // Add to total steps
       totalSteps += dailyTotalSteps;
 
-      // Check if the goal (10,000 steps) is met
+      // Check if the goal (1500 steps) is met
       if (dailyTotalSteps >= 1500) {
-        currentStreak++;
-        maxStreak = Math.max(maxStreak, currentStreak);  // Track the longest streak
+        // If this is the first entry or consecutive day
+        if (!lastDate || moment(date, 'DD/MM/YY').diff(moment(lastDate, 'DD/MM/YY'), 'days') === 1) {
+          currentStreak++;
+          maxStreak = Math.max(maxStreak, currentStreak);
+        } else {
+          // If there's a gap in dates, reset current streak
+          currentStreak = 1;
+        }
       } else {
-        currentStreak = 0;  // Reset the streak if goal is not met
+        // If goal not met, reset current streak
+        currentStreak = 0;
       }
+      
+      lastDate = date;
     }
 
     res.status(200).json({
