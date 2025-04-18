@@ -18,6 +18,7 @@ router.post('/purchaseBlockchain', validate(blockchainValidation.purchase), bloc
 // 🚀 Discount codes
 router.post('/validateDiscountCode', validate(discountValidation.validateDiscount), discountController.checkDiscount);
 router.post('/applyDiscountCode', validate(discountValidation.applyDiscount), discountController.applyDiscountCode);
+router.get('/getDiscountData', blockchainController.getDiscountData);
 
 
 

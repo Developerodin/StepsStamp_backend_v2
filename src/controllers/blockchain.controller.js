@@ -1,6 +1,7 @@
 import httpStatus from 'http-status';
 import catchAsync from '../utils/catchAsync.js';
 import * as blockchainService from '../services/blockchian.service.js';
+import Discount from '../models/discount.model.js';
 
 
 /**
@@ -80,5 +81,21 @@ const getActivePhase = async (req, res) => {
   }
 };
 
+const getDiscountData = catchAsync(async (req, res) => {
+  try {
+    const discounts = await Discount.find({ isActive: true });
+    res.status(httpStatus.OK).json({
+      success: true,
+      data: discounts
+    });
+  } catch (error) {
+    console.error('Error fetching discount data:', error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal Server Error'
+    });
+  }
+});
+
 export { getAllBlockchains, getActivePhase,saveSwapping,
-   getAllPhases, fetchGlobalSupply, getBlockchainById, purchaseBlockchain };
+   getAllPhases, fetchGlobalSupply, getBlockchainById, purchaseBlockchain, getDiscountData };
