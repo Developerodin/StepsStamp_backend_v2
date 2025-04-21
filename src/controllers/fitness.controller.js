@@ -106,6 +106,7 @@ const generateEmptyWeekStatus = () => {
     }
 
     const stepHistory = userFitness.stepHistory || new Map();
+    console.log("stepHistory ===>", stepHistory);
     const historyEntries = Array.from(stepHistory.entries());
 
     // Sort by date in ascending order
@@ -127,20 +128,35 @@ const generateEmptyWeekStatus = () => {
 
       // Check if the goal (1500 steps) is met
       if (dailyTotalSteps >= 1500) {
-        // If this is the first entry or consecutive day
-        if (!lastDate || moment(date, 'DD/MM/YY').diff(moment(lastDate, 'DD/MM/YY'), 'days') === 1) {
-          currentStreak++;
+        // If this is the first entry
+        if (!lastDate) {
+          currentStreak = 1;
           maxStreak = Math.max(maxStreak, currentStreak);
         } else {
-          // If there's a gap in dates, reset current streak
-          currentStreak = 1;
+          // Calculate days difference
+          const daysDiff = moment(date, 'DD/MM/YY').diff(moment(lastDate, 'DD/MM/YY'), 'days');
+          
+          // Only count as streak if it's exactly the next day
+          if (daysDiff === 1) {
+            currentStreak++;
+            maxStreak = Math.max(maxStreak, currentStreak);
+          } else {
+            // If there's any gap in dates, reset streak
+            currentStreak = 1;
+          }
         }
       } else {
-        // If goal not met, reset current streak
+        // If goal not met or no data for the day, reset current streak
         currentStreak = 0;
       }
       
       lastDate = date;
+    }
+
+    // If the last recorded date is not today, reset current streak
+    const today = moment().format('DD/MM/YY');
+    if (lastDate !== today) {
+      currentStreak = 0;
     }
 
     res.status(200).json({
