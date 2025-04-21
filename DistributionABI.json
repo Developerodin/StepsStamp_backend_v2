@@ -2,26 +2,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "burnSSBT",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "claimInvestorBonus",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "_ssbtToken",
 				"type": "address"
@@ -44,6 +24,11 @@
 			{
 				"internalType": "address",
 				"name": "_companyWalletB",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_companyWalletC",
 				"type": "address"
 			},
 			{
@@ -134,6 +119,19 @@
 			}
 		],
 		"name": "CompanyWalletCUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "newBalance",
+				"type": "uint256"
+			}
+		],
+		"name": "ContractBalanceUpdated",
 		"type": "event"
 	},
 	{
@@ -281,100 +279,6 @@
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "nftAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "nftType",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "referrer",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "referrerNFTaddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "discount",
-				"type": "uint256"
-			}
-		],
-		"name": "purchaseNFTWithBNB",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "nftAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "nftType",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "referrer",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "referrerNFTaddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "discount",
-				"type": "uint256"
-			}
-		],
-		"name": "purchaseNFTWithBUSD",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "nftAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "referrer",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "referrerNFTaddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "discount",
-				"type": "uint256"
-			}
-		],
-		"name": "purchaseNFTWithSSBT",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -413,176 +317,6 @@
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_newWallet",
-				"type": "address"
-			}
-		],
-		"name": "setCompanyWalletA",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_newWallet",
-				"type": "address"
-			}
-		],
-		"name": "setCompanyWalletB",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_newWallet",
-				"type": "address"
-			}
-		],
-		"name": "setCompanyWalletC",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "nftAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "enum DistributionContract.Phase",
-				"name": "phase",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint256",
-				"name": "bonus",
-				"type": "uint256"
-			}
-		],
-		"name": "setInvestorBonus",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "enum DistributionContract.Phase",
-				"name": "_phase",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_numOfDays",
-				"type": "uint256"
-			}
-		],
-		"name": "setPhaseMaxEndDate",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "nftAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "bonus",
-				"type": "uint256"
-			}
-		],
-		"name": "setReferralBonus",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_time",
-				"type": "uint256"
-			}
-		],
-		"name": "setTimer",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "_enabled",
-				"type": "bool"
-			}
-		],
-		"name": "toggleBNBPurchase",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "_enabled",
-				"type": "bool"
-			}
-		],
-		"name": "toggleBUSDPurchase",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "_enabled",
-				"type": "bool"
-			}
-		],
-		"name": "toggleSSBTPurchase",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -603,6 +337,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "SECONDS_IN_A_DAY",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "bnbPurchaseEnabled",
 		"outputs": [
 			{
@@ -612,6 +359,19 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "burnSSBT",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -638,6 +398,13 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "claimInvestorBonus",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -674,6 +441,19 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "contractBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -955,6 +735,100 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "_nftAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_nftType",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrer",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrerNFTaddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_discount",
+				"type": "uint256"
+			}
+		],
+		"name": "purchaseNFTWithBNB",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_nftAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_nftType",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrer",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrerNFTaddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_discount",
+				"type": "uint256"
+			}
+		],
+		"name": "purchaseNFTWithBUSD",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_nftAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrer",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrerNFTaddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_discount",
+				"type": "uint256"
+			}
+		],
+		"name": "purchaseNFTWithSSBT",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "",
 				"type": "address"
 			}
@@ -972,15 +846,120 @@
 	},
 	{
 		"inputs": [],
-		"name": "SECONDS_IN_A_DAY",
-		"outputs": [
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_newWallet",
+				"type": "address"
+			}
+		],
+		"name": "setCompanyWalletA",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_newWallet",
+				"type": "address"
+			}
+		],
+		"name": "setCompanyWalletB",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_newWallet",
+				"type": "address"
+			}
+		],
+		"name": "setCompanyWalletC",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_nftAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "enum DistributionContract.Phase",
+				"name": "phase",
+				"type": "uint8"
+			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "_bonus",
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
+		"name": "setInvestorBonus",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum DistributionContract.Phase",
+				"name": "_phase",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_numOfDays",
+				"type": "uint256"
+			}
+		],
+		"name": "setPhaseMaxEndDate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_nftAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_bonus",
+				"type": "uint256"
+			}
+		],
+		"name": "setReferralBonus",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_time",
+				"type": "uint256"
+			}
+		],
+		"name": "setTimer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -1025,6 +1004,45 @@
 	{
 		"inputs": [
 			{
+				"internalType": "bool",
+				"name": "_enabled",
+				"type": "bool"
+			}
+		],
+		"name": "toggleBNBPurchase",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bool",
+				"name": "_enabled",
+				"type": "bool"
+			}
+		],
+		"name": "toggleBUSDPurchase",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bool",
+				"name": "_enabled",
+				"type": "bool"
+			}
+		],
+		"name": "toggleSSBTPurchase",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
@@ -1057,6 +1075,32 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "updateContractBalance",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
