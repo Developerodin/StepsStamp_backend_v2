@@ -281,7 +281,8 @@ const saveInvestorBonusTransaction = async (transactionData) => {
     receiverWalletId: "company_wallet",
     amount: bonusAmount,
     currency,
-    transactionHash
+    transactionHash,
+    transactionStatus: 'claimed'
   });
 
   return transaction;
