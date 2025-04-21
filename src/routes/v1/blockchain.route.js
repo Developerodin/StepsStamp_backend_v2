@@ -10,7 +10,7 @@ import transactionValidation from '../../validations/transaction.validation.js';
 const router = express.Router();
 
 router.post('/saveSwap', validate(blockchainValidation.swap), blockchainController.saveSwapping);
-
+router.post('/saveInvestorBonus',  blockchainController.saveInvestorBonus);
 
 // 🚀 Purchase blockchain
 router.post('/purchaseBlockchain', validate(blockchainValidation.purchase), blockchainController.purchaseBlockchain);

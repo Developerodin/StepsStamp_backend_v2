@@ -259,8 +259,34 @@ const fetchActivePhase = async () => {
   }
 };
 
+const saveInvestorBonusTransaction = async (transactionData) => {
+  const {
+    userId,
+    senderWalletId,
+    transactionHash,
+    amount,
+    currency
+  } = transactionData;
 
+  // Ensure amount is a valid number
+  const bonusAmount = Number(amount);
+  if (isNaN(bonusAmount)) {
+    throw new Error('Amount must be a valid number');
+  }
 
+  const transaction = await TransactionHistory.create({
+    userId,
+    transactionType: 'investor_bonus',
+    senderWalletId,
+    receiverWalletId: "company_wallet",
+    amount: bonusAmount,
+    currency,
+    transactionHash,
+    transactionStatus: 'claimed'
+  });
+
+  return transaction;
+}
 
 export {
   getAllBlockchains,
@@ -269,5 +295,6 @@ export {
   getBlockchainById,
   getGlobalSupplyData,
   saveSwapTransaction,
-  savePurchaseTransaction
+  savePurchaseTransaction,
+  saveInvestorBonusTransaction
 };
