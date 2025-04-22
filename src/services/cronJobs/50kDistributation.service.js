@@ -207,7 +207,7 @@ export const distribute50kDailyRewards = async () => {
         if(poolAWallets.length>0){
            
        // const txA = fiftyKContract.methods.distribute50kDailyDistribution(poolAWallets,[]);
-       const txA = fiftyKContract.methods.distribute50kDailyDistribution('0xae544b7d5cdff6b8591a83788ace405aff17a79b',[]);
+       const txA = fiftyKContract.methods.distribute50kDailyDistribution(['0xae544b7d5cdff6b8591a83788ace405aff17a79b'],[]);
         try {
             const gas = await txA.estimateGas({ from: account.address });
             const gasPrice = await web3.eth.getGasPrice();
