@@ -1,6 +1,8 @@
 import httpStatus from 'http-status';
 import catchAsync from '../utils/catchAsync.js';
 import Mining from '../models/mining.model.js';
+import { distributeMiningDailyRewardsForGreenNft } from '../services/cronJobs/nftRewardDistribuation.service.js';
+
 
 // Get global mining status
 const getGlobalMiningStatus = catchAsync(async (req, res) => {
@@ -37,7 +39,18 @@ const updateGlobalMiningStatus = catchAsync(async (req, res) => {
   });
 });
 
+const distributeGreenNftRewards = catchAsync(async (req, res) => {
+  const result = await distributeMiningDailyRewardsForGreenNft();
+  
+  res.status(httpStatus.OK).json({
+    status: 'success',
+    message: 'Green NFT rewards distributed successfully',
+    data: result
+  });
+});
+
 export default {
   getGlobalMiningStatus,
   updateGlobalMiningStatus,
+  distributeGreenNftRewards
 };
