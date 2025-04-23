@@ -290,12 +290,42 @@ const updateUser = catchAsync(async (req, res) => {
 /***update user wallet */
 const updateUserWallet = catchAsync(async (req, res) => {
   const userId = req.body.userId;
+  const { decentralizedWalletAddress } = req.body;
 
-  const updated = await updateUserById(userId, req.body);
+  // Get current user data
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // If user already has a wallet address
+  if (user.decentralizedWalletAddress) {
+    // Check if the new address matches the existing one
+    if (user.decentralizedWalletAddress.toLowerCase() === decentralizedWalletAddress.toLowerCase()) {
+      // Addresses match, return success
+      return res.status(httpStatus.OK).json({
+        message: 'Wallet address already saved',
+        canLinkWallet: true,
+        walletAddress: user.decentralizedWalletAddress
+      });
+    } else {
+      // Addresses don't match, return error with masked address
+      const maskedAddress = `0x...${user.decentralizedWalletAddress.slice(-4)}`;
+      return res.status(httpStatus.BAD_REQUEST).json({
+        message: 'User account already linked with a wallet address',
+        canLinkWallet: false,
+        existingWalletAddress: maskedAddress
+      });
+    }
+  }
+
+  // If user doesn't have a wallet address, update it
+  const updated = await updateUserById(userId, { decentralizedWalletAddress });
   
   res.status(httpStatus.OK).json({
     message: 'Wallet updated successfully',
-    user: updated
+    canLinkWallet: true,
+    walletAddress: updated.decentralizedWalletAddress
   });
 });
 
