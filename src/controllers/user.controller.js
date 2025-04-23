@@ -290,7 +290,7 @@ const updateUser = catchAsync(async (req, res) => {
 /***update user wallet */
 const updateUserWallet = catchAsync(async (req, res) => {
   const userId = req.body.userId;
-  const { decentralizedWalletAddress } = req.body;
+  const { decentralizedWalletAddress, blockchainIds } = req.body;
 
   // Get current user data
   const user = await User.findById(userId);
@@ -302,12 +302,26 @@ const updateUserWallet = catchAsync(async (req, res) => {
   if (user.decentralizedWalletAddress) {
     // Check if the new address matches the existing one
     if (user.decentralizedWalletAddress.toLowerCase() === decentralizedWalletAddress.toLowerCase()) {
-      // Addresses match, return success
-      return res.status(httpStatus.OK).json({
-        message: 'Wallet address already saved',
-        canLinkWallet: true,
-        walletAddress: user.decentralizedWalletAddress
-      });
+      // Addresses match, update blockchainIds if provided
+      if (blockchainIds && Array.isArray(blockchainIds)) {
+        const updated = await updateUserById(userId, { 
+          decentralizedWalletAddress,
+          blockchainIds 
+        });
+        return res.status(httpStatus.OK).json({
+          message: 'Wallet address and blockchain data updated successfully',
+          canLinkWallet: true,
+          walletAddress: updated.decentralizedWalletAddress,
+          blockchainIds: updated.blockchainIds
+        });
+      } else {
+        // Just return success if no blockchainIds provided
+        return res.status(httpStatus.OK).json({
+          message: 'Wallet address already saved',
+          canLinkWallet: true,
+          walletAddress: user.decentralizedWalletAddress
+        });
+      }
     } else {
       // Addresses don't match, return error with masked address
       const maskedAddress = `0x...${user.decentralizedWalletAddress.slice(-4)}`;
@@ -319,14 +333,28 @@ const updateUserWallet = catchAsync(async (req, res) => {
     }
   }
 
-  // If user doesn't have a wallet address, update it
-  const updated = await updateUserById(userId, { decentralizedWalletAddress });
-  
-  res.status(httpStatus.OK).json({
-    message: 'Wallet updated successfully',
-    canLinkWallet: true,
-    walletAddress: updated.decentralizedWalletAddress
-  });
+  // If user doesn't have a wallet address
+  if (blockchainIds && Array.isArray(blockchainIds)) {
+    // Update both wallet address and blockchainIds
+    const updated = await updateUserById(userId, { 
+      decentralizedWalletAddress,
+      blockchainIds 
+    });
+    return res.status(httpStatus.OK).json({
+      message: 'Wallet and blockchain data updated successfully',
+      canLinkWallet: true,
+      walletAddress: updated.decentralizedWalletAddress,
+      blockchainIds: updated.blockchainIds
+    });
+  } else {
+    // Just update wallet address
+    const updated = await updateUserById(userId, { decentralizedWalletAddress });
+    return res.status(httpStatus.OK).json({
+      message: 'Wallet updated successfully',
+      canLinkWallet: true,
+      walletAddress: updated.decentralizedWalletAddress
+    });
+  }
 });
 
  const getAllUsers = catchAsync(async (req, res) => {
