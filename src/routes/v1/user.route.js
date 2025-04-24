@@ -35,7 +35,7 @@ router.post('/activate-blockchain',authMiddleware(),validate(userValidation.acti
 router.post('/test', userController.test);
 
 router.patch('/update-profile',authMiddleware(),validate(userValidation.updateUser),userController.updateUser);
-router.patch('/update-user-wallet',authMiddleware(),validate(userValidation.updateUserWallet),userController.updateUserWallet);
+router.patch('/update-user-wallet',authMiddleware(),userController.updateUserWallet);
 router.post('/forgot-password' ,validate(userValidation.checkEmail), userController.forgotPassword);
 router.post('/verify-reset-otp' ,validate(userValidation.verifyResetOtp), userController.verifyResetOtpController);
 
