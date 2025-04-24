@@ -357,6 +357,32 @@ const updateUserWallet = catchAsync(async (req, res) => {
   }
 });
 
+const updateNotificationToken = async (req, res) => {
+  const { userId } = req.params;
+    const { notificationToken } = req.body;
+  try {
+      const user = await User.findById(userId);
+      if (!user) {
+          throw new Error('User not found');
+      }
+      user.notificationToken = notificationToken;
+      await user.save();
+      return res.status(200).json({
+        status: true,
+        message: 'Notification token updated successfully',
+      });
+       
+  } catch (error) {
+      console.error('Error updating notification token:', error);
+     
+       return res.status(400).json({
+        status: false,
+        message: 'Failed to update notification token',
+      });
+  }
+};
+
+
  const getAllUsers = catchAsync(async (req, res) => {
   const users = await getAllUsersService();
   res.status(httpStatus.OK).json({ users });
@@ -480,5 +506,5 @@ const getMiningStatus = async (req, res) => {
 
 export { verifyOtpController, getWatchesByUserId,
    activateBlockchain, getUserByRefferalCode, getActiveBlockchain, getUser, deleteAccount, checkUsername, getFollowers, getAllUsers, googleLogin, test, updateUserWallet, updateUser, verifyResetOtpController, resetUserPassword, forgotPassword, registerUser, loginUser, checkEmail
-  ,toggleMiningStatus,getMiningStatus
+  ,toggleMiningStatus,getMiningStatus,updateNotificationToken
   };

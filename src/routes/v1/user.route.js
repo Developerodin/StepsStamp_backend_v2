@@ -42,7 +42,7 @@ router.post('/verify-reset-otp' ,validate(userValidation.verifyResetOtp), userCo
 router.post('/reset-password', validate(userValidation.resetPassword), userController.resetUserPassword);
 
 router.post('/delete-account',authMiddleware(), validate(userValidation.deleteAccount), userController.deleteAccount);
-
+router.post('/:userId/update-token', userController.updateNotificationToken);
 
 /**
  * @route GET /users/followers/:userId
