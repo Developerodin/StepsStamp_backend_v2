@@ -1,7 +1,7 @@
 import DailyReward from '../models/dailyrewards.model.js';
 import User from '../models/user.model.js';
 import { Blockchain } from '../models/blockchain.model.js';
-import UserFitness from '../models/userFitness.mode.js';
+import Pool from '../models/pools.model.js';
 
 /**
  * Calculate and distribute NFT rewards for a specific pool type and NFT
@@ -39,44 +39,25 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
       const eligibleUsers = new Map(); // Use Map to ensure unique users
       let totalSteps = 0;
 
-      // Get latest step data for each user
+      // Get latest pool data for each user
       for (const user of poolUsers) {
         // Skip if we already processed this user
         if (eligibleUsers.has(user.userId._id.toString())) {
           continue;
         }
 
-        const userFitness = await UserFitness.findOne({ userId: user.userId._id })
-          .sort({ 'stepHistory': -1 })
-          .limit(1);
+        const userPool = await Pool.findOne({ 
+          userId: user.userId._id,
+          poolType: poolType === 'A' ? 'PoolA' : 'PoolB'
+        }).sort({ date: -1 }).limit(1);
 
-        // console.log("Steps data of pool users", userFitness.stepHistory);
-        
-        if (userFitness && userFitness.stepHistory) {
-          // Convert Map to array of entries and sort by date
-          const stepEntries = Array.from(userFitness.stepHistory.entries());
-          stepEntries.sort((a, b) => {
-            // Convert DD/MM/YY to YYYY-MM-DD for proper date comparison
-            const [dayA, monthA, yearA] = a[0].split('/');
-            const [dayB, monthB, yearB] = b[0].split('/');
-            const dateA = new Date(`20${yearA}-${monthA}-${dayA}`);
-            const dateB = new Date(`20${yearB}-${monthB}-${dayB}`);
-            return dateB - dateA;
+        if (userPool) {
+          eligibleUsers.set(user.userId._id.toString(), {
+            user,
+            steps: userPool.stepsRecorded,
+            date: userPool.date
           });
-
-          if (stepEntries.length > 0) {
-            const [latestDate, stepData] = stepEntries[0];
-            // console.log("latestDate", latestDate);
-            const latestSteps = stepData[0]?.rewardSteps || 0;
-            // console.log("latestSteps", latestSteps);
-
-            eligibleUsers.set(user.userId._id.toString(), {
-              user,
-              steps: latestSteps,
-              date: latestDate
-            });
-            totalSteps += latestSteps;
-          }
+          totalSteps += userPool.stepsRecorded;
         }
       }
 
