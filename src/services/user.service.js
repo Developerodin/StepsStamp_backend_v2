@@ -154,7 +154,7 @@ const getUsersBlockchain = async (userId) => {
 
     // Find users who signed up using this referral code
     const activeBlockchainId = await User.findById(userId)
-      .select('activeBlockchainId')
+      .select('activeBlockchainId nftAddress')
       .lean();
      
     return activeBlockchainId;

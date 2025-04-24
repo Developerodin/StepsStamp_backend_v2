@@ -9,6 +9,6 @@ router.patch('/', miningController.updateGlobalMiningStatus); // Update mining s
 
 router
   .route('/distribute-green-nft-rewards')
-  .post(auth(), miningController.distributeGreenNftRewards);
+  .post( miningController.distributeGreenNftRewards);
 
 export default router;

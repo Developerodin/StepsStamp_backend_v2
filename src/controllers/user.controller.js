@@ -385,7 +385,12 @@ const getActiveBlockchain = catchAsync(async (req, res) => {
 
   const activeBlockchainId = await getUsersBlockchain(userId);
   if (activeBlockchainId) {
-    res.status(httpStatus.OK).send({ exists: true, message: 'User exists', activeBlockchainId });
+    res.status(httpStatus.OK).send({ 
+      exists: true, 
+      message: 'User exists', 
+      activeBlockchainId: activeBlockchainId.activeBlockchainId,
+      nftAddress: activeBlockchainId.nftAddress 
+    });
   } else {
     res.status(httpStatus.OK).send({ exists: false, message: 'User does not exists'});
   }
