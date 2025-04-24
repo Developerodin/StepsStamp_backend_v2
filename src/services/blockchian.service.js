@@ -265,7 +265,8 @@ const saveInvestorBonusTransaction = async (transactionData) => {
     senderWalletId,
     transactionHash,
     amount,
-    currency
+    currency,
+    transactionType
   } = transactionData;
 
   // Ensure amount is a valid number
@@ -276,7 +277,7 @@ const saveInvestorBonusTransaction = async (transactionData) => {
 
   const transaction = await TransactionHistory.create({
     userId,
-    transactionType: 'investor_bonus',
+    transactionType: transactionType,
     senderWalletId,
     receiverWalletId: "company_wallet",
     amount: bonusAmount,

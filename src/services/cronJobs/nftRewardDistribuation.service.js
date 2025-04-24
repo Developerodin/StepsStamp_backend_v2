@@ -273,8 +273,8 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const distributeMiningDailyRewardsForGreenNft = async () => {
     try {
-        const poolA = await calculatePoolRewards('A', nftAddresses.White);
-        const poolB = await calculatePoolRewards('B', nftAddresses.White);
+        const poolA = await calculatePoolRewards('A', nftAddresses.Green);
+        const poolB = await calculatePoolRewards('B', nftAddresses.Green);
 
         console.log("poolA", poolA);
         console.log("poolB", poolB);
