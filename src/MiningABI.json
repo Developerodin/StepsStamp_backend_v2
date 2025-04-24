@@ -3,44 +3,6 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "nftContract",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "activateNFT",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "burnSSBT",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "claimMiningReward",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
 				"name": "_ssbtToken",
 				"type": "address"
 			},
@@ -53,6 +15,11 @@
 				"internalType": "string[5]",
 				"name": "_colors",
 				"type": "string[5]"
+			},
+			{
+				"internalType": "address",
+				"name": "_adminWallet",
+				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -79,6 +46,19 @@
 		],
 		"name": "OwnableUnauthorizedAccount",
 		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "adminWalletAddress",
+				"type": "address"
+			}
+		],
+		"name": "AdminWalletUpdated",
+		"type": "event"
 	},
 	{
 		"anonymous": false,
@@ -138,13 +118,6 @@
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -168,24 +141,6 @@
 		],
 		"name": "RewardDistributed",
 		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address[5]",
-				"name": "_nftContracts",
-				"type": "address[5]"
-			},
-			{
-				"internalType": "string[5]",
-				"name": "_colors",
-				"type": "string[5]"
-			}
-		],
-		"name": "setMicroNFTContracts",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -213,32 +168,32 @@
 		"type": "event"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "TOTAL_DAILY_DISTRIBUTION",
+		"outputs": [
 			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "address[]",
-				"name": "users",
-				"type": "address[]"
+				"internalType": "address",
+				"name": "nftContract",
+				"type": "address"
 			},
 			{
-				"internalType": "uint256[]",
-				"name": "userRewards",
-				"type": "uint256[]"
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
 			}
 		],
-		"name": "updateUserRewards",
+		"name": "activateNFT",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -312,6 +267,26 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "burnSSBT",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "claimMiningReward",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -391,6 +366,31 @@
 	},
 	{
 		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address[5]",
+				"name": "_nftContracts",
+				"type": "address[5]"
+			},
+			{
+				"internalType": "string[5]",
+				"name": "_colors",
+				"type": "string[5]"
+			}
+		],
+		"name": "setMicroNFTContracts",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "ssbtToken",
 		"outputs": [
 			{
@@ -403,16 +403,47 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "TOTAL_DAILY_DISTRIBUTION",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
 			}
 		],
-		"stateMutability": "view",
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"name": "updateAdminWallet",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address[]",
+				"name": "users",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "userRewards",
+				"type": "uint256[]"
+			}
+		],
+		"name": "updateUserRewards",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{

@@ -266,6 +266,492 @@ export const distribute50kDailyRewards = async () => {
 export const distributeMiningDailyRewardsForGreenNft = async () => {
    
     try {
+            const poolA = await calculatePoolRewards('A',nftAddresses.Green )
+            const poolB = await calculatePoolRewards('B',nftAddresses.Green )
+   
+        console.log("poolA",poolA);
+        console.log("poolB",poolB);
+
+        const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
+           
+        // Create object with wallet address as key and tokens as value for Pool A
+        const poolARewardsObj = poolA.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+
+        // Create object with wallet address as key and tokens as value for Pool B
+        const poolBRewardsObj = poolB.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+        
+        // Convert objects to arrays
+        const poolARewards = Object.entries(poolARewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        const poolBRewards = Object.entries(poolBRewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        
+        console.log("Pool A Rewards:", poolARewards);
+        console.log("Pool B Rewards:", poolBRewards);
+        
+        // Get just the wallet addresses for contract calls
+        const poolAWallets = Object.keys(poolARewardsObj);
+        const poolBWallets = Object.keys(poolBRewardsObj);
+        
+        console.log(`Total eligible users: Pool A - ${poolAWallets.length}, Pool B - ${poolBWallets.length}`);
+        
+        if(poolAWallets.length>0){
+            // Convert poolARewards to the format expected by the contract
+            const poolAAddresses = poolAWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolARewardValues = poolAWallets.map(address => {
+                const tokens = poolARewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+           
+            console.log("poolARewardValues",poolARewardValues);
+            console.log("poolAAddresses",poolAAddresses);
+            
+            // Log contract details
+            console.log("Contract Address:", process.env.Mining);
+            // console.log("Contract ABI:", Mining_ABI);
+
+            // Check if our account is the owner of the contract
+            const contractOwner = await miningContract.methods.owner().call();
+            console.log("Contract Owner:", contractOwner);
+            console.log("Our Account:", account.address);
+
+            // if (contractOwner.toLowerCase() !== account.address.toLowerCase()) {
+            //     throw new Error(`Account ${account.address} is not authorized to call this function. Contract owner is ${contractOwner}`);
+            // }
+
+            const txA = miningContract.methods.updateUserRewards(poolAAddresses, poolARewardValues);
+            console.log("txA",txA);
+            
+            try {
+                const gas = await txA.estimateGas({ from: account.address });
+                console.log("gas",gas);
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
+                    data: txA.encodeABI()
+                };
+                console.log("txData",txData);
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+       }
+        
+        if(poolBWallets.length>0){
+            // Convert poolBRewards to the format expected by the contract
+            const poolBAddresses = poolBWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolBRewardValues = poolBWallets.map(address => {
+                const tokens = poolBRewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+
+            const txB = miningContract.methods.updateUserRewards(poolBAddresses, poolBRewardValues);
+            try {
+                // First try to call the function to see if it works
+                await txB.call({ from: account.address });
+                
+                const gas = await txB.estimateGas({ from: account.address });
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
+                    data: txB.encodeABI()
+                };
+        
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+        }
+
+        return {
+            poolA: poolARewards,
+            poolB: poolBRewards
+        };
+
+     } catch (error) {
+         console.error('Error distributing daily mioning rewards:', error);
+         throw error;
+     }
+   
+};
+
+export const distributeMiningDailyRewardsForGoldNft = async () => {
+   
+    try {
+            const poolA = await calculatePoolRewards('A',nftAddresses.Gold )
+            const poolB = await calculatePoolRewards('B',nftAddresses.Gold )
+   
+        console.log("poolA",poolA);
+        console.log("poolB",poolB);
+
+        const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
+           
+        // Create object with wallet address as key and tokens as value for Pool A
+        const poolARewardsObj = poolA.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+
+        // Create object with wallet address as key and tokens as value for Pool B
+        const poolBRewardsObj = poolB.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+        
+        // Convert objects to arrays
+        const poolARewards = Object.entries(poolARewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        const poolBRewards = Object.entries(poolBRewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        
+        console.log("Pool A Rewards:", poolARewards);
+        console.log("Pool B Rewards:", poolBRewards);
+        
+        // Get just the wallet addresses for contract calls
+        const poolAWallets = Object.keys(poolARewardsObj);
+        const poolBWallets = Object.keys(poolBRewardsObj);
+        
+        console.log(`Total eligible users: Pool A - ${poolAWallets.length}, Pool B - ${poolBWallets.length}`);
+        
+        if(poolAWallets.length>0){
+            // Convert poolARewards to the format expected by the contract
+            const poolAAddresses = poolAWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolARewardValues = poolAWallets.map(address => {
+                const tokens = poolARewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+           
+            console.log("poolARewardValues",poolARewardValues);
+            console.log("poolAAddresses",poolAAddresses);
+            
+            // Log contract details
+            console.log("Contract Address:", process.env.Mining);
+            // console.log("Contract ABI:", Mining_ABI);
+
+            // Check if our account is the owner of the contract
+            const contractOwner = await miningContract.methods.owner().call();
+            console.log("Contract Owner:", contractOwner);
+            console.log("Our Account:", account.address);
+
+            // if (contractOwner.toLowerCase() !== account.address.toLowerCase()) {
+            //     throw new Error(`Account ${account.address} is not authorized to call this function. Contract owner is ${contractOwner}`);
+            // }
+
+            const txA = miningContract.methods.updateUserRewards(poolAAddresses, poolARewardValues);
+            console.log("txA",txA);
+            
+            try {
+                const gas = await txA.estimateGas({ from: account.address });
+                console.log("gas",gas);
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
+                    data: txA.encodeABI()
+                };
+                console.log("txData",txData);
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+       }
+        
+        if(poolBWallets.length>0){
+            // Convert poolBRewards to the format expected by the contract
+            const poolBAddresses = poolBWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolBRewardValues = poolBWallets.map(address => {
+                const tokens = poolBRewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+
+            const txB = miningContract.methods.updateUserRewards(poolBAddresses, poolBRewardValues);
+            try {
+                // First try to call the function to see if it works
+                await txB.call({ from: account.address });
+                
+                const gas = await txB.estimateGas({ from: account.address });
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
+                    data: txB.encodeABI()
+                };
+        
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+        }
+
+        return {
+            poolA: poolARewards,
+            poolB: poolBRewards
+        };
+
+     } catch (error) {
+         console.error('Error distributing daily mioning rewards:', error);
+         throw error;
+     }
+   
+};
+
+export const distributeMiningDailyRewardsForSilverNft = async () => {
+   
+    try {
+            const poolA = await calculatePoolRewards('A',nftAddresses.Silver )
+            const poolB = await calculatePoolRewards('B',nftAddresses.Silver )
+   
+        console.log("poolA",poolA);
+        console.log("poolB",poolB);
+
+        const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
+           
+        // Create object with wallet address as key and tokens as value for Pool A
+        const poolARewardsObj = poolA.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+
+        // Create object with wallet address as key and tokens as value for Pool B
+        const poolBRewardsObj = poolB.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+        
+        // Convert objects to arrays
+        const poolARewards = Object.entries(poolARewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        const poolBRewards = Object.entries(poolBRewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        
+        console.log("Pool A Rewards:", poolARewards);
+        console.log("Pool B Rewards:", poolBRewards);
+        
+        // Get just the wallet addresses for contract calls
+        const poolAWallets = Object.keys(poolARewardsObj);
+        const poolBWallets = Object.keys(poolBRewardsObj);
+        
+        console.log(`Total eligible users: Pool A - ${poolAWallets.length}, Pool B - ${poolBWallets.length}`);
+        
+        if(poolAWallets.length>0){
+            // Convert poolARewards to the format expected by the contract
+            const poolAAddresses = poolAWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolARewardValues = poolAWallets.map(address => {
+                const tokens = poolARewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+           
+            console.log("poolARewardValues",poolARewardValues);
+            console.log("poolAAddresses",poolAAddresses);
+            
+            // Log contract details
+            console.log("Contract Address:", process.env.Mining);
+            // console.log("Contract ABI:", Mining_ABI);
+
+            // Check if our account is the owner of the contract
+            const contractOwner = await miningContract.methods.owner().call();
+            console.log("Contract Owner:", contractOwner);
+            console.log("Our Account:", account.address);
+
+            // if (contractOwner.toLowerCase() !== account.address.toLowerCase()) {
+            //     throw new Error(`Account ${account.address} is not authorized to call this function. Contract owner is ${contractOwner}`);
+            // }
+
+            const txA = miningContract.methods.updateUserRewards(poolAAddresses, poolARewardValues);
+            console.log("txA",txA);
+            
+            try {
+                const gas = await txA.estimateGas({ from: account.address });
+                console.log("gas",gas);
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
+                    data: txA.encodeABI()
+                };
+                console.log("txData",txData);
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+       }
+        
+        if(poolBWallets.length>0){
+            // Convert poolBRewards to the format expected by the contract
+            const poolBAddresses = poolBWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolBRewardValues = poolBWallets.map(address => {
+                const tokens = poolBRewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+
+            const txB = miningContract.methods.updateUserRewards(poolBAddresses, poolBRewardValues);
+            try {
+                // First try to call the function to see if it works
+                await txB.call({ from: account.address });
+                
+                const gas = await txB.estimateGas({ from: account.address });
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
+                    data: txB.encodeABI()
+                };
+        
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+        }
+
+        return {
+            poolA: poolARewards,
+            poolB: poolBRewards
+        };
+
+     } catch (error) {
+         console.error('Error distributing daily mioning rewards:', error);
+         throw error;
+     }
+   
+};
+
+export const distributeMiningDailyRewardsForWhiteNft = async () => {
+   
+    try {
             const poolA = await calculatePoolRewards('A',nftAddresses.White )
             const poolB = await calculatePoolRewards('B',nftAddresses.White )
    
@@ -346,7 +832,169 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
                     to: CONTRACT_ADDRESS,
                     gas: Number(gasLimit),
                     gasPrice,
+                    data: txA.encodeABI()
+                };
+                console.log("txData",txData);
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+       }
+        
+        if(poolBWallets.length>0){
+            // Convert poolBRewards to the format expected by the contract
+            const poolBAddresses = poolBWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolBRewardValues = poolBWallets.map(address => {
+                const tokens = poolBRewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+
+            const txB = miningContract.methods.updateUserRewards(poolBAddresses, poolBRewardValues);
+            try {
+                // First try to call the function to see if it works
+                await txB.call({ from: account.address });
+                
+                const gas = await txB.estimateGas({ from: account.address });
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
                     data: txB.encodeABI()
+                };
+        
+                const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
+                const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    
+                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+            } catch (error) {
+                console.error("❌ Transaction Failed. Full error:", error);
+                if (error.data) {
+                    console.error("Error data:", error.data);
+                }
+                if (error.message) {
+                    console.error("Error message:", error.message);
+                }
+                if (error.reason) {
+                    console.error("Error reason:", error.reason);
+                }
+            }
+        }
+
+        return {
+            poolA: poolARewards,
+            poolB: poolBRewards
+        };
+
+     } catch (error) {
+         console.error('Error distributing daily mioning rewards:', error);
+         throw error;
+     }
+   
+};
+
+export const distributeMiningDailyRewardsForBlackNft = async () => {
+   
+    try {
+            const poolA = await calculatePoolRewards('A',nftAddresses.Black )
+            const poolB = await calculatePoolRewards('B',nftAddresses.Black )
+   
+        console.log("poolA",poolA);
+        console.log("poolB",poolB);
+
+        const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
+           
+        // Create object with wallet address as key and tokens as value for Pool A
+        const poolARewardsObj = poolA.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+
+        // Create object with wallet address as key and tokens as value for Pool B
+        const poolBRewardsObj = poolB.reduce((acc, user) => {
+            if (isValidEthAddress(user.decentralizedWalletAddress)) {
+                acc[user.decentralizedWalletAddress] = user.tokens;
+            }
+            return acc;
+        }, {});
+        
+        // Convert objects to arrays
+        const poolARewards = Object.entries(poolARewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        const poolBRewards = Object.entries(poolBRewardsObj).map(([address, tokens]) => ({
+            [address]: tokens
+        }));
+        
+        console.log("Pool A Rewards:", poolARewards);
+        console.log("Pool B Rewards:", poolBRewards);
+        
+        // Get just the wallet addresses for contract calls
+        const poolAWallets = Object.keys(poolARewardsObj);
+        const poolBWallets = Object.keys(poolBRewardsObj);
+        
+        console.log(`Total eligible users: Pool A - ${poolAWallets.length}, Pool B - ${poolBWallets.length}`);
+        
+        if(poolAWallets.length>0){
+            // Convert poolARewards to the format expected by the contract
+            const poolAAddresses = poolAWallets;
+            // Convert decimal tokens to integers (multiply by 10^18)
+            const poolARewardValues = poolAWallets.map(address => {
+                const tokens = poolARewardsObj[address];
+                return web3.utils.toWei(tokens.toString(), 'ether');
+            });
+           
+            console.log("poolARewardValues",poolARewardValues);
+            console.log("poolAAddresses",poolAAddresses);
+            
+            // Log contract details
+            console.log("Contract Address:", process.env.Mining);
+            // console.log("Contract ABI:", Mining_ABI);
+
+            // Check if our account is the owner of the contract
+            const contractOwner = await miningContract.methods.owner().call();
+            console.log("Contract Owner:", contractOwner);
+            console.log("Our Account:", account.address);
+
+            // if (contractOwner.toLowerCase() !== account.address.toLowerCase()) {
+            //     throw new Error(`Account ${account.address} is not authorized to call this function. Contract owner is ${contractOwner}`);
+            // }
+
+            const txA = miningContract.methods.updateUserRewards(poolAAddresses, poolARewardValues);
+            console.log("txA",txA);
+            
+            try {
+                const gas = await txA.estimateGas({ from: account.address });
+                console.log("gas",gas);
+                const gasPrice = await web3.eth.getGasPrice();
+                const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
+                const CONTRACT_ADDRESS = process.env.Mining;
+                const txData = {
+                    from: account.address,
+                    to: CONTRACT_ADDRESS,
+                    gas: Number(gasLimit),
+                    gasPrice,
+                    data: txA.encodeABI()
                 };
                 console.log("txData",txData);
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
@@ -427,16 +1075,20 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
 
 
 
-// cron.schedule('0 0 * * *', async() => {
-//   await distributeBonusForAllNFTs();
-//   await distribute50kDailyRewards();
+cron.schedule('0 0 * * *', async() => {
+  await distributeMiningDailyRewardsForGreenNft();
+  await distributeMiningDailyRewardsForGoldNft();
+  await distributeMiningDailyRewardsForSilverNft();
+  await distributeMiningDailyRewardsForWhiteNft();
+  await distributeMiningDailyRewardsForBlackNft();
 
-//   console.log("This function runs after 10 seconds.");
 
-//   },{
-//     timezone: 'Etc/UTC' // 🔥 This ensures it runs at GMT-00
-//   }
-// ); // 10000 milliseconds = 10 seconds
+  console.log("This function runs after 10 seconds.");
+
+  },{
+    timezone: 'Etc/UTC' // 🔥 This ensures it runs at GMT-00
+  }
+); // 10000 milliseconds = 10 seconds
 
 
 console.log('⏳ Cron job set to run daily at GMT+00.');
