@@ -326,7 +326,8 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-           
+            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
+            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -493,7 +494,8 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-           
+            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
+            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -525,7 +527,7 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
         
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                console.log("✅ Tx Successful! Hash for pool A:", receipt.transactionHash);
                 await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
 
                 // Wait for transaction to be confirmed
@@ -578,7 +580,7 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                console.log("✅ Tx Successful! Hash for pool B:", receipt.transactionHash);
                 await getTransactionDetails(receipt.transactionHash, "pool_B_reward");
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
@@ -660,7 +662,8 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-           
+            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
+            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -692,7 +695,7 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
         
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                console.log("✅ Tx Successful! Hash for pool A:", receipt.transactionHash);
                 await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
 
                 // Wait for transaction to be confirmed
@@ -745,7 +748,7 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
+                console.log("✅ Tx Successful! Hash for pool B:", receipt.transactionHash);
                 await getTransactionDetails(receipt.transactionHash, "pool_B_reward");
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
@@ -773,13 +776,12 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
 };
 
 export const distributeMiningDailyRewardsForWhiteNft = async () => {
-   
     try {
-            const poolA = await calculatePoolRewards('A',nftAddresses.White )
-            const poolB = await calculatePoolRewards('B',nftAddresses.White )
-   
-        console.log("poolA",poolA);
-        console.log("poolB",poolB);
+        const poolA = await calculatePoolRewards('A', nftAddresses.White);
+        const poolB = await calculatePoolRewards('B', nftAddresses.White);
+
+        console.log("poolA", poolA);
+        console.log("poolB", poolB);
 
         const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
            
@@ -816,37 +818,36 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
         
         console.log(`Total eligible users: Pool A - ${poolAWallets.length}, Pool B - ${poolBWallets.length}`);
         
-        if(poolAWallets.length>0){
+        if(poolAWallets.length > 0) {
+            // Get current nonce
+            const nonce = await getNextNonce(account.address);
+            console.log("Current nonce:", nonce);
+
             // Convert poolARewards to the format expected by the contract
             const poolAAddresses = poolAWallets;
             // Convert decimal tokens to integers (multiply by 10^18)
             const poolARewardValues = poolAWallets.map(address => {
                 const tokens = poolARewardsObj[address];
-                return web3.utils.toWei(tokens.toString(), 'ether');
+                return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-           
-            console.log("poolARewardValues",poolARewardValues);
-            console.log("poolAAddresses",poolAAddresses);
+            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
+            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
+            console.log("poolARewardValues", poolARewardValues);
+            console.log("poolAAddresses", poolAAddresses);
             
             // Log contract details
             console.log("Contract Address:", process.env.Mining);
-            // console.log("Contract ABI:", Mining_ABI);
 
             // Check if our account is the owner of the contract
             const contractOwner = await miningContract.methods.owner().call();
             console.log("Contract Owner:", contractOwner);
             console.log("Our Account:", account.address);
 
-            // if (contractOwner.toLowerCase() !== account.address.toLowerCase()) {
-            //     throw new Error(`Account ${account.address} is not authorized to call this function. Contract owner is ${contractOwner}`);
-            // }
-
             const txA = miningContract.methods.updateUserRewards(poolAAddresses, poolARewardValues);
-            console.log("txA",txA);
             
             try {
                 const gas = await txA.estimateGas({ from: account.address });
-                console.log("gas",gas);
+                console.log("gas", gas);
                 const gasPrice = await web3.eth.getGasPrice();
                 const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
                 const CONTRACT_ADDRESS = process.env.Mining;
@@ -855,14 +856,18 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
                     to: CONTRACT_ADDRESS,
                     gas: Number(gasLimit),
                     gasPrice,
+                    nonce: nonce,
                     data: txA.encodeABI()
                 };
-                console.log("txData",txData);
+                console.log("txData", txData);
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
         
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
-                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+                console.log("✅ Tx Successful! Hash for pool A:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
+
+                // Wait for transaction to be confirmed
+                await delay(1000); // 5 second delay
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -875,21 +880,25 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
                     console.error("Error reason:", error.reason);
                 }
             }
-       }
+        }
         
-        if(poolBWallets.length>0){
+        if(poolBWallets.length > 0) {
+            // Get updated nonce after Pool A transaction
+            const nonce = await getNextNonce(account.address);
+            console.log("Updated nonce for Pool B:", nonce);
+
             // Convert poolBRewards to the format expected by the contract
             const poolBAddresses = poolBWallets;
             // Convert decimal tokens to integers (multiply by 10^18)
             const poolBRewardValues = poolBWallets.map(address => {
                 const tokens = poolBRewardsObj[address];
-                return web3.utils.toWei(tokens.toString(), 'ether');
+                return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
 
             const txB = miningContract.methods.updateUserRewards(poolBAddresses, poolBRewardValues);
             try {
                 // First try to call the function to see if it works
-               
+                await txB.call({ from: account.address });
                 
                 const gas = await txB.estimateGas({ from: account.address });
                 const gasPrice = await web3.eth.getGasPrice();
@@ -900,14 +909,15 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
                     to: CONTRACT_ADDRESS,
                     gas: Number(gasLimit),
                     gasPrice,
+                    nonce: nonce,
                     data: txB.encodeABI()
                 };
         
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
-                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+                console.log("✅ Tx Successful! Hash for pool B:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash, "pool_B_reward");
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -927,21 +937,19 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
             poolB: poolBRewards
         };
 
-     } catch (error) {
-         console.error('Error distributing daily mioning rewards:', error);
-         throw error;
-     }
-   
+    } catch (error) {
+        console.error('Error distributing daily mining rewards:', error);
+        throw error;
+    }
 };
 
 export const distributeMiningDailyRewardsForBlackNft = async () => {
-   
     try {
-            const poolA = await calculatePoolRewards('A',nftAddresses.Black )
-            const poolB = await calculatePoolRewards('B',nftAddresses.Black )
-   
-        console.log("poolA",poolA);
-        console.log("poolB",poolB);
+        const poolA = await calculatePoolRewards('A', nftAddresses.Black);
+        const poolB = await calculatePoolRewards('B', nftAddresses.Black);
+
+        console.log("poolA", poolA);
+        console.log("poolB", poolB);
 
         const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
            
@@ -978,37 +986,36 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
         
         console.log(`Total eligible users: Pool A - ${poolAWallets.length}, Pool B - ${poolBWallets.length}`);
         
-        if(poolAWallets.length>0){
+        if(poolAWallets.length > 0) {
+            // Get current nonce
+            const nonce = await getNextNonce(account.address);
+            console.log("Current nonce:", nonce);
+
             // Convert poolARewards to the format expected by the contract
             const poolAAddresses = poolAWallets;
             // Convert decimal tokens to integers (multiply by 10^18)
             const poolARewardValues = poolAWallets.map(address => {
                 const tokens = poolARewardsObj[address];
-                return web3.utils.toWei(tokens.toString(), 'ether');
+                return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-           
-            console.log("poolARewardValues",poolARewardValues);
-            console.log("poolAAddresses",poolAAddresses);
+            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
+            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
+            console.log("poolARewardValues", poolARewardValues);
+            console.log("poolAAddresses", poolAAddresses);
             
             // Log contract details
             console.log("Contract Address:", process.env.Mining);
-            // console.log("Contract ABI:", Mining_ABI);
 
             // Check if our account is the owner of the contract
             const contractOwner = await miningContract.methods.owner().call();
             console.log("Contract Owner:", contractOwner);
             console.log("Our Account:", account.address);
 
-            // if (contractOwner.toLowerCase() !== account.address.toLowerCase()) {
-            //     throw new Error(`Account ${account.address} is not authorized to call this function. Contract owner is ${contractOwner}`);
-            // }
-
             const txA = miningContract.methods.updateUserRewards(poolAAddresses, poolARewardValues);
-            console.log("txA",txA);
             
             try {
                 const gas = await txA.estimateGas({ from: account.address });
-                console.log("gas",gas);
+                console.log("gas", gas);
                 const gasPrice = await web3.eth.getGasPrice();
                 const gasLimit = BigInt(gas) * BigInt(12) / BigInt(10);
                 const CONTRACT_ADDRESS = process.env.Mining;
@@ -1017,14 +1024,18 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
                     to: CONTRACT_ADDRESS,
                     gas: Number(gasLimit),
                     gasPrice,
+                    nonce: nonce,
                     data: txA.encodeABI()
                 };
-                console.log("txData",txData);
+                console.log("txData", txData);
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
         
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
-                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+                console.log("✅ Tx Successful! Hash for pool A:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
+
+                // Wait for transaction to be confirmed
+                await delay(1000); // 5 second delay
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -1037,21 +1048,25 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
                     console.error("Error reason:", error.reason);
                 }
             }
-       }
+        }
         
-        if(poolBWallets.length>0){
+        if(poolBWallets.length > 0) {
+            // Get updated nonce after Pool A transaction
+            const nonce = await getNextNonce(account.address);
+            console.log("Updated nonce for Pool B:", nonce);
+
             // Convert poolBRewards to the format expected by the contract
             const poolBAddresses = poolBWallets;
             // Convert decimal tokens to integers (multiply by 10^18)
             const poolBRewardValues = poolBWallets.map(address => {
                 const tokens = poolBRewardsObj[address];
-                return web3.utils.toWei(tokens.toString(), 'ether');
+                return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
 
             const txB = miningContract.methods.updateUserRewards(poolBAddresses, poolBRewardValues);
             try {
                 // First try to call the function to see if it works
-           
+                await txB.call({ from: account.address });
                 
                 const gas = await txB.estimateGas({ from: account.address });
                 const gasPrice = await web3.eth.getGasPrice();
@@ -1062,14 +1077,15 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
                     to: CONTRACT_ADDRESS,
                     gas: Number(gasLimit),
                     gasPrice,
+                    nonce: nonce,
                     data: txB.encodeABI()
                 };
         
                 const signedTx = await web3.eth.accounts.signTransaction(txData, formattedPrivateKey);
                 const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     
-                console.log("✅ Tx Successful! Hash:", receipt.transactionHash);
-                await getTransactionDetails(receipt.transactionHash,"pool_B_reward");
+                console.log("✅ Tx Successful! Hash for pool B:", receipt.transactionHash);
+                await getTransactionDetails(receipt.transactionHash, "pool_B_reward");
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -1089,11 +1105,10 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
             poolB: poolBRewards
         };
 
-     } catch (error) {
-         console.error('Error distributing daily mioning rewards:', error);
-         throw error;
-     }
-   
+    } catch (error) {
+        console.error('Error distributing daily mining rewards:', error);
+        throw error;
+    }
 };
 
 
