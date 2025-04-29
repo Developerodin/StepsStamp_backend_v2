@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post('/saveSwap', validate(blockchainValidation.swap), blockchainController.saveSwapping);
 router.post('/saveInvestorBonus',  blockchainController.saveInvestorBonus);
-
+router.post('/saveCustomTransaction',  blockchainController.saveTransactionAdvanced);
 // 🚀 Purchase blockchain
 router.post('/purchaseBlockchain', validate(blockchainValidation.purchase), blockchainController.purchaseBlockchain);
 

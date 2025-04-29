@@ -164,6 +164,63 @@ const getAllPurchaseTransactions = catchAsync(async (req, res) => {
   }
 });
 
+const getTransactionsByType = async (req, res) => {
+  try {
+    const { userId, transactionType } = req.body;
+
+    if (!userId || !transactionType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Both userId and transactionType are required'
+      });
+    }
+
+    // Validate transactionType against enum values
+    const validTransactionTypes = [
+      'deposit',
+      'withdrawal',
+      'staking',
+      'unstaking',
+      'swap',
+      'referral_bonus',
+      'investor_bonus',
+      'watch_bonus',
+      'phase_bonus',
+      'daily_reward',
+      'pool_A_reward',
+      'pool_B_reward',
+      'purchase',
+      'deposite_against_purchase'
+    ];
+
+    if (!validTransactionTypes.includes(transactionType)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid transaction type'
+      });
+    }
+
+    const transactions = await TransactionHistory.find({
+      userId,
+      transactionType
+    }).sort({ timestamp: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: transactions,
+      message: 'Transactions retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Error in getTransactionsByType:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+};
+
 
 
 
@@ -176,4 +233,5 @@ export default {
   getLastNDaysRewards,
   getAllUsersTransactionHistory,
   getAllPurchaseTransactions,
+  getTransactionsByType,
 };

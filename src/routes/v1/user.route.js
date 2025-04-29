@@ -6,6 +6,7 @@ import * as userController from '../../controllers/user.controller.js';
 import { otpRateLimiter } from '../../middlewares/otpRateLimit.js';
 import jwt from 'jsonwebtoken';
 import authMiddleware from '../../middlewares/auth.middlewares.js';
+import transactionController from '../../controllers/transaction.controller.js';
 const router = express.Router();
 
 
@@ -61,5 +62,8 @@ router.post('/toggle-mining-status',authMiddleware(), userController.toggleMinin
 
 // Route to get mining status by userId
 router.get('/:userId/mining-details',authMiddleware(), userController.getMiningStatus);
+
+// Route to get transactions by type for a user
+router.post('/transactions/type', authMiddleware(), transactionController.getTransactionsByType);
 
 export default router;

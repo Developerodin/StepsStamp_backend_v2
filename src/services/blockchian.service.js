@@ -262,7 +262,7 @@ const fetchActivePhase = async () => {
 const saveInvestorBonusTransaction = async (transactionData) => {
   const {
     userId,
-    senderWalletId,
+    receiverWalletId,
     transactionHash,
     amount,
     currency,
@@ -278,12 +278,44 @@ const saveInvestorBonusTransaction = async (transactionData) => {
   const transaction = await TransactionHistory.create({
     userId,
     transactionType: transactionType,
-    senderWalletId,
-    receiverWalletId: "company_wallet",
+    senderWalletId:"company_wallet",
+    receiverWalletId: receiverWalletId,
     amount: bonusAmount,
     currency,
     transactionHash,
     transactionStatus: 'claimed'
+  });
+
+  return transaction;
+}
+
+const saveCustomTransaction = async (transactionData) => {
+  const {
+    userId,
+    senderWalletId,
+    receiverWalletId,
+    transactionHash,
+    amount,
+    currency,
+    transactionType,
+    transactionStatus
+  } = transactionData;
+
+  // Ensure amount is a valid number
+  const bonusAmount = Number(amount);
+  if (isNaN(bonusAmount)) {
+    throw new Error('Amount must be a valid number');
+  }
+
+  const transaction = await TransactionHistory.create({
+    userId,
+    transactionType,
+    senderWalletId,
+    receiverWalletId,
+    amount: bonusAmount,
+    currency,
+    transactionHash,
+    transactionStatus
   });
 
   return transaction;
@@ -297,5 +329,6 @@ export {
   getGlobalSupplyData,
   saveSwapTransaction,
   savePurchaseTransaction,
-  saveInvestorBonusTransaction
+  saveInvestorBonusTransaction,
+  saveCustomTransaction
 };
