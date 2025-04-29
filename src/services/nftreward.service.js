@@ -11,21 +11,28 @@ import Pool from '../models/pools.model.js';
  */
 export const calculatePoolRewards = async (poolType, nftAddress) => {
   try {
-    // console.log("calculatePoolRewards poolType called", poolType);
     // Find all users in the specified pool type with the given NFT address
     const poolUsers = await DailyReward.find({
       poolType,
       nftAddress
     }).populate('userId', 'name decentralizedWalletAddress');
 
-    if (!poolUsers.length) {
-      return [];
+    if (!poolUsers || poolUsers.length === 0) {
+      return {
+        success: false,
+        message: 'No users found in the specified pool',
+        rewards: []
+      };
     }
 
     // Get NFT data from blockchain model
     const nftData = await Blockchain.findOne({ nftAddress });
     if (!nftData) {
-      throw new Error('NFT data not found');
+      return {
+        success: false,
+        message: 'NFT data not found',
+        rewards: []
+      };
     }
 
     // Calculate total tokens for the pool (half of daily mining cap)
@@ -41,6 +48,11 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
 
       // Get latest pool data for each user
       for (const user of poolUsers) {
+        // Skip if user data is invalid
+        if (!user || !user.userId || !user.userId._id) {
+          continue;
+        }
+
         // Skip if we already processed this user
         if (eligibleUsers.has(user.userId._id.toString())) {
           continue;
@@ -61,6 +73,15 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
         }
       }
 
+      // If no eligible users found, return empty rewards
+      if (eligibleUsers.size === 0 || totalSteps === 0) {
+        return {
+          success: false,
+          message: 'No eligible users found in Pool A',
+          rewards: []
+        };
+      }
+
       // Calculate tokens based on steps proportion
       rewards = Array.from(eligibleUsers.values()).map(({ user, steps, date }) => ({
         userId: user.userId._id,
@@ -76,9 +97,22 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
     } else {
       // For Pool B: Equal distribution
       const uniqueUsers = new Map(); // Use Map to ensure unique users
+      
+      // Filter out invalid users
       poolUsers.forEach(user => {
-        uniqueUsers.set(user.userId._id.toString(), user);
+        if (user && user.userId && user.userId._id) {
+          uniqueUsers.set(user.userId._id.toString(), user);
+        }
       });
+
+      // If no valid users found, return empty rewards
+      if (uniqueUsers.size === 0) {
+        return {
+          success: false,
+          message: 'No eligible users found in Pool B',
+          rewards: []
+        };
+      }
 
       const tokensPerUser = poolTokens / uniqueUsers.size;
       rewards = Array.from(uniqueUsers.values()).map(user => ({
@@ -92,7 +126,11 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
       }));
     }
 
-    return rewards;
+    return {
+      success: true,
+      message: 'Rewards calculated successfully',
+      rewards
+    };
   } catch (error) {
     throw new Error(`Error calculating pool rewards: ${error.message}`);
   }

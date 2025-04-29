@@ -273,11 +273,28 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const distributeMiningDailyRewardsForGreenNft = async () => {
     try {
-        const poolA = await calculatePoolRewards('A', nftAddresses.Green);
-        const poolB = await calculatePoolRewards('B', nftAddresses.Green);
+        const poolAResult = await calculatePoolRewards('A', nftAddresses.Green);
+        const poolBResult = await calculatePoolRewards('B', nftAddresses.Green);
 
-        console.log("poolA", poolA);
-        console.log("poolB", poolB);
+        console.log("poolA result:", poolAResult);
+        console.log("poolB result:", poolBResult);
+
+        // Check if either pool calculation failed
+        if (!poolAResult.success || !poolBResult.success) {
+            console.log("Pool calculation failed:", {
+                poolA: poolAResult.message,
+                poolB: poolBResult.message
+            });
+            return {
+                success: false,
+                message: "Failed to calculate pool rewards",
+                poolA: poolAResult.rewards,
+                poolB: poolBResult.rewards
+            };
+        }
+
+        const poolA = poolAResult.rewards;
+        const poolB = poolBResult.rewards;
 
         const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
            
@@ -326,8 +343,6 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
-            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -363,7 +378,7 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
                 await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
 
                 // Wait for transaction to be confirmed
-                await delay(1000); // 5 second delay
+                await delay(1000); // 1 second delay
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -429,6 +444,8 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
         }
 
         return {
+            success: true,
+            message: "Rewards distributed successfully",
             poolA: poolARewards,
             poolB: poolBRewards
         };
@@ -441,11 +458,28 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
 
 export const distributeMiningDailyRewardsForGoldNft = async () => {
     try {
-        const poolA = await calculatePoolRewards('A', nftAddresses.Gold);
-        const poolB = await calculatePoolRewards('B', nftAddresses.Gold);
+        const poolAResult = await calculatePoolRewards('A', nftAddresses.Gold);
+        const poolBResult = await calculatePoolRewards('B', nftAddresses.Gold);
 
-        console.log("poolA", poolA);
-        console.log("poolB", poolB);
+        console.log("poolA result:", poolAResult);
+        console.log("poolB result:", poolBResult);
+
+        // Check if either pool calculation failed
+        if (!poolAResult.success || !poolBResult.success) {
+            console.log("Pool calculation failed:", {
+                poolA: poolAResult.message,
+                poolB: poolBResult.message
+            });
+            return {
+                success: false,
+                message: "Failed to calculate pool rewards",
+                poolA: poolAResult.rewards,
+                poolB: poolBResult.rewards
+            };
+        }
+
+        const poolA = poolAResult.rewards;
+        const poolB = poolBResult.rewards;
 
         const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
            
@@ -494,8 +528,6 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
-            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -531,7 +563,7 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
                 await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
 
                 // Wait for transaction to be confirmed
-                await delay(1000); // 5 second delay
+                await delay(1000); // 1 second delay
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -597,6 +629,8 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
         }
 
         return {
+            success: true,
+            message: "Rewards distributed successfully",
             poolA: poolARewards,
             poolB: poolBRewards
         };
@@ -609,11 +643,28 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
 
 export const distributeMiningDailyRewardsForSilverNft = async () => {
     try {
-        const poolA = await calculatePoolRewards('A', nftAddresses.Silver);
-        const poolB = await calculatePoolRewards('B', nftAddresses.Silver);
+        const poolAResult = await calculatePoolRewards('A', nftAddresses.Silver);
+        const poolBResult = await calculatePoolRewards('B', nftAddresses.Silver);
 
-        console.log("poolA", poolA);
-        console.log("poolB", poolB);
+        console.log("poolA result:", poolAResult);
+        console.log("poolB result:", poolBResult);
+
+        // Check if either pool calculation failed
+        if (!poolAResult.success || !poolBResult.success) {
+            console.log("Pool calculation failed:", {
+                poolA: poolAResult.message,
+                poolB: poolBResult.message
+            });
+            return {
+                success: false,
+                message: "Failed to calculate pool rewards",
+                poolA: poolAResult.rewards,
+                poolB: poolBResult.rewards
+            };
+        }
+
+        const poolA = poolAResult.rewards;
+        const poolB = poolBResult.rewards;
 
         const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
            
@@ -662,8 +713,6 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
-            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -699,7 +748,7 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
                 await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
 
                 // Wait for transaction to be confirmed
-                await delay(1000); // 5 second delay
+                await delay(1000); // 1 second delay
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -765,6 +814,8 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
         }
 
         return {
+            success: true,
+            message: "Rewards distributed successfully",
             poolA: poolARewards,
             poolB: poolBRewards
         };
@@ -777,11 +828,28 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
 
 export const distributeMiningDailyRewardsForWhiteNft = async () => {
     try {
-        const poolA = await calculatePoolRewards('A', nftAddresses.White);
-        const poolB = await calculatePoolRewards('B', nftAddresses.White);
+        const poolAResult = await calculatePoolRewards('A', nftAddresses.White);
+        const poolBResult = await calculatePoolRewards('B', nftAddresses.White);
 
-        console.log("poolA", poolA);
-        console.log("poolB", poolB);
+        console.log("poolA result:", poolAResult);
+        console.log("poolB result:", poolBResult);
+
+        // Check if either pool calculation failed
+        if (!poolAResult.success || !poolBResult.success) {
+            console.log("Pool calculation failed:", {
+                poolA: poolAResult.message,
+                poolB: poolBResult.message
+            });
+            return {
+                success: false,
+                message: "Failed to calculate pool rewards",
+                poolA: poolAResult.rewards,
+                poolB: poolBResult.rewards
+            };
+        }
+
+        const poolA = poolAResult.rewards;
+        const poolB = poolBResult.rewards;
 
         const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
            
@@ -830,8 +898,6 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
-            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -867,7 +933,7 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
                 await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
 
                 // Wait for transaction to be confirmed
-                await delay(1000); // 5 second delay
+                await delay(1000); // 1 second delay
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -933,6 +999,8 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
         }
 
         return {
+            success: true,
+            message: "Rewards distributed successfully",
             poolA: poolARewards,
             poolB: poolBRewards
         };
@@ -945,11 +1013,28 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
 
 export const distributeMiningDailyRewardsForBlackNft = async () => {
     try {
-        const poolA = await calculatePoolRewards('A', nftAddresses.Black);
-        const poolB = await calculatePoolRewards('B', nftAddresses.Black);
+        const poolAResult = await calculatePoolRewards('A', nftAddresses.Black);
+        const poolBResult = await calculatePoolRewards('B', nftAddresses.Black);
 
-        console.log("poolA", poolA);
-        console.log("poolB", poolB);
+        console.log("poolA result:", poolAResult);
+        console.log("poolB result:", poolBResult);
+
+        // Check if either pool calculation failed
+        if (!poolAResult.success || !poolBResult.success) {
+            console.log("Pool calculation failed:", {
+                poolA: poolAResult.message,
+                poolB: poolBResult.message
+            });
+            return {
+                success: false,
+                message: "Failed to calculate pool rewards",
+                poolA: poolAResult.rewards,
+                poolB: poolBResult.rewards
+            };
+        }
+
+        const poolA = poolAResult.rewards;
+        const poolB = poolBResult.rewards;
 
         const isValidEthAddress = (addr) => web3.utils.isAddress(addr);
            
@@ -998,8 +1083,6 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            // const poolAAddresses=["0xae544b7d5cdff6b8591a83788ace405aff17a79b"]
-            //const poolARewardValues = [web3.utils.toWei("100.8909", 'ether')]
             console.log("poolARewardValues", poolARewardValues);
             console.log("poolAAddresses", poolAAddresses);
             
@@ -1035,7 +1118,7 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
                 await getTransactionDetails(receipt.transactionHash, "pool_A_reward");
 
                 // Wait for transaction to be confirmed
-                await delay(1000); // 5 second delay
+                await delay(1000); // 1 second delay
             } catch (error) {
                 console.error("❌ Transaction Failed. Full error:", error);
                 if (error.data) {
@@ -1101,6 +1184,8 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
         }
 
         return {
+            success: true,
+            message: "Rewards distributed successfully",
             poolA: poolARewards,
             poolB: poolBRewards
         };

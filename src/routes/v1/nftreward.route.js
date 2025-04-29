@@ -8,4 +8,8 @@ router
   .route('/pool-rewards')
   .get( nftRewardController.getPoolRewards);
 
+router
+  .route('/distribute-all-rewards')
+  .post(nftRewardController.distributeAllRewards);
+
 export default router; 
