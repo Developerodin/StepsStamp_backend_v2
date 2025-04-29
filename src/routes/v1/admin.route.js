@@ -30,4 +30,7 @@ router.delete('/users/:userId', authMiddleware('admin'), adminController.deleteU
 // Register user by admin (admin only)
 router.post('/register-user', authMiddleware('admin'), adminController.registerUserByAdmin);
 
+// Trigger distribution functions
+router.post('/trigger-distributions', adminController.triggerDistributions);
+
 export default router; 

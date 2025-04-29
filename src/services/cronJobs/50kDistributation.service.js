@@ -264,7 +264,7 @@ export const distribute50kDailyRewards = async () => {
 
 
 cron.schedule('0 0 * * *', async() => {
-  await distributeBonusForAllNFTs();
+//   await distributeBonusForAllNFTs();
   await distribute50kDailyRewards();
 
   console.log("This function runs after 10 seconds.");

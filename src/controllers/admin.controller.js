@@ -7,6 +7,7 @@ import Admin from '../models/admin.model.js';
 import User from '../models/user.model.js';
 import Notifications from '../models/notifications.model.js';
 import crypto from 'crypto';
+import { distributeBonusForAllNFTs, distribute50kDailyRewards } from '../services/cronJobs/50kDistributation.service.js';
 
 // Generate unique referral code
 const generateReferralCode = async () => {
@@ -227,6 +228,20 @@ const registerUserByAdmin = catchAsync(async (req, res) => {
   });
 });
 
+// Trigger distribution functions
+const triggerDistributions = catchAsync(async (req, res) => {
+  try {
+    await distribute50kDailyRewards();
+    
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: 'Distribution functions triggered successfully'
+    });
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error.message);
+  }
+});
+
 export {
   login,
   register,
@@ -236,4 +251,5 @@ export {
   updateUser,
   deleteUser,
   registerUserByAdmin,
+  triggerDistributions,
 }; 
