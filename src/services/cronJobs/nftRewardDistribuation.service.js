@@ -1198,7 +1198,7 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
 
 
 
-cron.schedule('*/2 * * * *', async() => {
+cron.schedule('0 0 * * *', async() => {
   await distributeMiningDailyRewardsForGreenNft();
   await distributeMiningDailyRewardsForGoldNft();
   await distributeMiningDailyRewardsForSilverNft();
@@ -1206,7 +1206,7 @@ cron.schedule('*/2 * * * *', async() => {
   await distributeMiningDailyRewardsForBlackNft();
 
 
-  console.log("This function runs in every 2 minutes.");
+  console.log("This function runs after 10 seconds.");
 
   },{
     timezone: 'Etc/UTC' // 🔥 This ensures it runs at GMT-00
