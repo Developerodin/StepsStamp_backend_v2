@@ -8,6 +8,7 @@ import User from '../models/user.model.js';
 import Notifications from '../models/notifications.model.js';
 import crypto from 'crypto';
 import { distributeBonusForAllNFTs, distribute50kDailyRewards } from '../services/cronJobs/50kDistributation.service.js';
+import resetDailyData from '../services/cronJobs/dailyStepsReset.service.js';
 
 // Generate unique referral code
 const generateReferralCode = async () => {
@@ -242,6 +243,15 @@ const triggerDistributions = catchAsync(async (req, res) => {
   }
 });
 
+const triggerDailyReset = async (req, res) => {
+  try {
+    await resetDailyData();
+    res.status(200).json({ success: true, message: 'Daily reset triggered successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export {
   login,
   register,
@@ -252,4 +262,5 @@ export {
   deleteUser,
   registerUserByAdmin,
   triggerDistributions,
+  triggerDailyReset,
 }; 

@@ -33,4 +33,7 @@ router.post('/register-user', authMiddleware('admin'), adminController.registerU
 // Trigger distribution functions
 router.post('/trigger-distributions', adminController.triggerDistributions);
 
+// Admin routes
+router.post('/trigger-daily-reset', adminController.triggerDailyReset);
+
 export default router; 

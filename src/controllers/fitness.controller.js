@@ -74,8 +74,8 @@ const generateEmptyWeekStatus = () => {
         // Sum all walking and reward steps for the day
         const totalWalkingSteps = dailySteps.reduce((acc, entry) => acc + (entry.walkingSteps || 0), 0);
         const totalRewardSteps = dailySteps.reduce((acc, entry) => acc + (entry.rewardSteps || 0), 0);
-        const totalSteps = totalWalkingSteps + totalRewardSteps;
-
+        const totalSteps =totalRewardSteps;
+          //  console.log("totalSteps ===>", totalSteps);
         // Set true if the total steps >= 10,000
         weeklyGoalStatus[dayName] = totalSteps >= 1500;
       } else {

@@ -276,8 +276,8 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
         const poolAResult = await calculatePoolRewards('A', nftAddresses.Green);
         const poolBResult = await calculatePoolRewards('B', nftAddresses.Green);
 
-        console.log("poolA result:", poolAResult);
-        console.log("poolB result:", poolBResult);
+        // console.log("poolA result:", poolAResult);
+        // console.log("poolB result:", poolBResult);
 
         // Check if either pool calculation failed
         if (!poolAResult.success || !poolBResult.success) {
@@ -322,8 +322,8 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
             [address]: tokens
         }));
         
-        console.log("Pool A Rewards:", poolARewards);
-        console.log("Pool B Rewards:", poolBRewards);
+        // console.log("Pool A Rewards:", poolARewards);
+        // console.log("Pool B Rewards:", poolBRewards);
         
         // Get just the wallet addresses for contract calls
         const poolAWallets = Object.keys(poolARewardsObj);
@@ -343,8 +343,8 @@ export const distributeMiningDailyRewardsForGreenNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            console.log("poolARewardValues", poolARewardValues);
-            console.log("poolAAddresses", poolAAddresses);
+            // console.log("poolARewardValues", poolARewardValues);
+            // console.log("poolAAddresses", poolAAddresses);
             
             // Log contract details
             console.log("Contract Address:", process.env.Mining);
@@ -461,8 +461,8 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
         const poolAResult = await calculatePoolRewards('A', nftAddresses.Gold);
         const poolBResult = await calculatePoolRewards('B', nftAddresses.Gold);
 
-        console.log("poolA result:", poolAResult);
-        console.log("poolB result:", poolBResult);
+        // console.log("poolA result:", poolAResult);
+        // console.log("poolB result:", poolBResult);
 
         // Check if either pool calculation failed
         if (!poolAResult.success || !poolBResult.success) {
@@ -507,8 +507,8 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
             [address]: tokens
         }));
         
-        console.log("Pool A Rewards:", poolARewards);
-        console.log("Pool B Rewards:", poolBRewards);
+        // console.log("Pool A Rewards:", poolARewards);
+        // console.log("Pool B Rewards:", poolBRewards);
         
         // Get just the wallet addresses for contract calls
         const poolAWallets = Object.keys(poolARewardsObj);
@@ -528,16 +528,16 @@ export const distributeMiningDailyRewardsForGoldNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            console.log("poolARewardValues", poolARewardValues);
-            console.log("poolAAddresses", poolAAddresses);
+            // console.log("poolARewardValues", poolARewardValues);
+            // console.log("poolAAddresses", poolAAddresses);
             
             // Log contract details
             console.log("Contract Address:", process.env.Mining);
 
             // Check if our account is the owner of the contract
             const contractOwner = await miningContract.methods.owner().call();
-            console.log("Contract Owner:", contractOwner);
-            console.log("Our Account:", account.address);
+            // console.log("Contract Owner:", contractOwner);
+            // console.log("Our Account:", account.address);
 
             const txA = miningContract.methods.updateUserRewards(poolAAddresses, poolARewardValues);
             
@@ -646,8 +646,8 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
         const poolAResult = await calculatePoolRewards('A', nftAddresses.Silver);
         const poolBResult = await calculatePoolRewards('B', nftAddresses.Silver);
 
-        console.log("poolA result:", poolAResult);
-        console.log("poolB result:", poolBResult);
+        // console.log("poolA result:", poolAResult);
+        // console.log("poolB result:", poolBResult);
 
         // Check if either pool calculation failed
         if (!poolAResult.success || !poolBResult.success) {
@@ -692,8 +692,8 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
             [address]: tokens
         }));
         
-        console.log("Pool A Rewards:", poolARewards);
-        console.log("Pool B Rewards:", poolBRewards);
+        // console.log("Pool A Rewards:", poolARewards);
+        // console.log("Pool B Rewards:", poolBRewards);
         
         // Get just the wallet addresses for contract calls
         const poolAWallets = Object.keys(poolARewardsObj);
@@ -713,8 +713,8 @@ export const distributeMiningDailyRewardsForSilverNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            console.log("poolARewardValues", poolARewardValues);
-            console.log("poolAAddresses", poolAAddresses);
+            // console.log("poolARewardValues", poolARewardValues);
+            // console.log("poolAAddresses", poolAAddresses);
             
             // Log contract details
             console.log("Contract Address:", process.env.Mining);
@@ -831,8 +831,8 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
         const poolAResult = await calculatePoolRewards('A', nftAddresses.White);
         const poolBResult = await calculatePoolRewards('B', nftAddresses.White);
 
-        console.log("poolA result:", poolAResult);
-        console.log("poolB result:", poolBResult);
+        // console.log("poolA result:", poolAResult);
+        // console.log("poolB result:", poolBResult);
 
         // Check if either pool calculation failed
         if (!poolAResult.success || !poolBResult.success) {
@@ -877,8 +877,8 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
             [address]: tokens
         }));
         
-        console.log("Pool A Rewards:", poolARewards);
-        console.log("Pool B Rewards:", poolBRewards);
+        // console.log("Pool A Rewards:", poolARewards);
+        // console.log("Pool B Rewards:", poolBRewards);
         
         // Get just the wallet addresses for contract calls
         const poolAWallets = Object.keys(poolARewardsObj);
@@ -898,8 +898,8 @@ export const distributeMiningDailyRewardsForWhiteNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            console.log("poolARewardValues", poolARewardValues);
-            console.log("poolAAddresses", poolAAddresses);
+            // console.log("poolARewardValues", poolARewardValues);
+            // console.log("poolAAddresses", poolAAddresses);
             
             // Log contract details
             console.log("Contract Address:", process.env.Mining);
@@ -1016,8 +1016,8 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
         const poolAResult = await calculatePoolRewards('A', nftAddresses.Black);
         const poolBResult = await calculatePoolRewards('B', nftAddresses.Black);
 
-        console.log("poolA result:", poolAResult);
-        console.log("poolB result:", poolBResult);
+        // console.log("poolA result:", poolAResult);
+        // console.log("poolB result:", poolBResult);
 
         // Check if either pool calculation failed
         if (!poolAResult.success || !poolBResult.success) {
@@ -1062,8 +1062,8 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
             [address]: tokens
         }));
         
-        console.log("Pool A Rewards:", poolARewards);
-        console.log("Pool B Rewards:", poolBRewards);
+        // console.log("Pool A Rewards:", poolARewards);
+        // console.log("Pool B Rewards:", poolBRewards);
         
         // Get just the wallet addresses for contract calls
         const poolAWallets = Object.keys(poolARewardsObj);
@@ -1083,8 +1083,8 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
                 const tokens = poolARewardsObj[address];
                 return web3.utils.toWei(tokens.toString(), 'ether').toString();
             });
-            console.log("poolARewardValues", poolARewardValues);
-            console.log("poolAAddresses", poolAAddresses);
+            // console.log("poolARewardValues", poolARewardValues);
+            // console.log("poolAAddresses", poolAAddresses);
             
             // Log contract details
             console.log("Contract Address:", process.env.Mining);
