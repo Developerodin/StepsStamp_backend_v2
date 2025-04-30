@@ -1198,20 +1198,18 @@ export const distributeMiningDailyRewardsForBlackNft = async () => {
 
 
 
-cron.schedule('0 0 * * *', async() => {
+cron.schedule('*/2 * * * *', async() => {
   await distributeMiningDailyRewardsForGreenNft();
   await distributeMiningDailyRewardsForGoldNft();
   await distributeMiningDailyRewardsForSilverNft();
   await distributeMiningDailyRewardsForWhiteNft();
   await distributeMiningDailyRewardsForBlackNft();
 
-
-  console.log("This function runs after 10 seconds.");
+  console.log("This function runs every 5 minutes for testing.");
 
   },{
     timezone: 'Etc/UTC' // 🔥 This ensures it runs at GMT-00
   }
-); // 10000 milliseconds = 10 seconds
+);
 
-
-console.log('⏳ Cron job set to run daily at GMT+00.');
+console.log('⏳ Cron job set to run every 5 minutes for testing.');
