@@ -1205,11 +1205,13 @@ cron.schedule('*/2 * * * *', async() => {
   await distributeMiningDailyRewardsForWhiteNft();
   await distributeMiningDailyRewardsForBlackNft();
 
-  console.log("This function runs every 5 minutes for testing.");
+
+  console.log("This function runs in every 2 minutes.");
 
   },{
     timezone: 'Etc/UTC' // 🔥 This ensures it runs at GMT-00
   }
-);
+); // 10000 milliseconds = 10 seconds
 
-console.log('⏳ Cron job set to run every 5 minutes for testing.');
+
+console.log('⏳ Cron job set to run daily at GMT+00.');
