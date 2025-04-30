@@ -221,8 +221,71 @@ const getTransactionsByType = async (req, res) => {
   }
 };
 
+const getAllStakingTransactions = catchAsync(async (req, res) => {
+  try {
+    // Fetch all staking transactions and populate user details
+    const transactions = await TransactionHistory.find({ transactionType: 'staking' })
+      .populate({
+        path: 'userId',
+        select: 'name decentralizedWalletAddress nftAddress', // Include nftAddress in the selection
+      })
+      .sort({ timestamp: -1 }); // Sort by most recent transactions
 
+    // Format the response
+    const formattedTransactions = transactions.map((transaction) => ({
+      date: transaction.timestamp,
+      amount: transaction.amount,
+      userId: transaction.userId._id,
+      nftAddress: transaction.userId.nftAddress || null,
+      decentralizedWalletAddress: transaction.userId.decentralizedWalletAddress || null,
+      name: transaction.userId.name || 'Unknown User',
+      transactionStatus: transaction.transactionStatus,
+      transactionHash: transaction.transactionHash || null
+    }));
 
+    res.status(httpStatus.OK).json({ success: true, data: formattedTransactions });
+  } catch (error) {
+    console.error('Error fetching staking transactions:', error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ 
+      success: false, 
+      message: 'Internal Server Error',
+      error: error.message 
+    });
+  }
+});
+
+const getAllUnstakingTransactions = catchAsync(async (req, res) => {
+  try {
+    // Fetch all unstaking transactions and populate user details
+    const transactions = await TransactionHistory.find({ transactionType: 'unstaking' })
+      .populate({
+        path: 'userId',
+        select: 'name decentralizedWalletAddress nftAddress', // Include nftAddress in the selection
+      })
+      .sort({ timestamp: -1 }); // Sort by most recent transactions
+
+    // Format the response
+    const formattedTransactions = transactions.map((transaction) => ({
+      date: transaction.timestamp,
+      amount: transaction.amount,
+      userId: transaction.userId._id,
+      nftAddress: transaction.userId.nftAddress || null,
+      decentralizedWalletAddress: transaction.userId.decentralizedWalletAddress || null,
+      name: transaction.userId.name || 'Unknown User',
+      transactionStatus: transaction.transactionStatus,
+      transactionHash: transaction.transactionHash || null
+    }));
+
+    res.status(httpStatus.OK).json({ success: true, data: formattedTransactions });
+  } catch (error) {
+    console.error('Error fetching unstaking transactions:', error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ 
+      success: false, 
+      message: 'Internal Server Error',
+      error: error.message 
+    });
+  }
+});
 
 export default {
   getAllTransactions,
@@ -234,4 +297,6 @@ export default {
   getAllUsersTransactionHistory,
   getAllPurchaseTransactions,
   getTransactionsByType,
+  getAllStakingTransactions,
+  getAllUnstakingTransactions,
 };

@@ -43,6 +43,8 @@ router.get('/transactions/user/:userId/type/:transactionType', validate(transact
 router.post('/transactions/user/lastNDays', transactionController.getLastNDaysRewards);
 router.get('/transactions/transactionHistory', transactionController.getAllUsersTransactionHistory);
 router.get('/transactions/purchaseHistory', transactionController.getAllPurchaseTransactions);
+router.get('/transactions/staking', transactionController.getAllStakingTransactions);
+router.get('/transactions/unstaking', transactionController.getAllUnstakingTransactions);
 
 
 
