@@ -174,11 +174,11 @@ const savePurchaseTransaction = async (transactionData) => {
 
    // Step 7: Save Refferal Bonus Transaction (if applicable)
    const refferalPercent = {
-    "0x785D9267A1356355e3d995690586fFC1d464DC09": ".07",
-    "0x4d60bdDF3BbA7E4650bd8D7be8429E8429D81D97": ".07",
-    "0xd0d6DB480C2Db70244Ca530bA78958ABf54Dc3e2": ".08",
-    "0x7991218c6299E2400DaF947DF5BA5BbDF3406c86": ".10",
-    "0xB8173BA58e988Eb6982179d7D306f2b439d42d80": ".15"
+    [process.env.WHITE_NFT]: ".07",
+    [process.env.BLACK_NFT]: ".07",
+    [process.env.SILVER_NFT]: ".08",
+    [process.env.GOLD_NFT]: ".10",
+    [process.env.GREEN_NFT]: ".15"
   };
    const refPecent = refferalPercent[referrerNftAddress];
    
