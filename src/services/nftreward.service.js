@@ -19,7 +19,7 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
 
     if (!poolUsers || poolUsers.length === 0) {
       return {
-        success: false,
+        success: true,
         message: 'No users found in the specified pool',
         rewards: []
       };
@@ -29,7 +29,7 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
     const nftData = await Blockchain.findOne({ nftAddress });
     if (!nftData) {
       return {
-        success: false,
+        success: true,
         message: 'NFT data not found',
         rewards: []
       };
@@ -76,7 +76,7 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
       // If no eligible users found, return empty rewards
       if (eligibleUsers.size === 0 || totalSteps === 0) {
         return {
-          success: false,
+          success: true,
           message: 'No eligible users found in Pool A',
           rewards: []
         };
@@ -108,7 +108,7 @@ export const calculatePoolRewards = async (poolType, nftAddress) => {
       // If no valid users found, return empty rewards
       if (uniqueUsers.size === 0) {
         return {
-          success: false,
+          success: true,
           message: 'No eligible users found in Pool B',
           rewards: []
         };
