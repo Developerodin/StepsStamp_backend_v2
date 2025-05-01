@@ -46,30 +46,40 @@ const generateEmptyWeekStatus = () => {
     const { userId } = req.params;
     const today = moment().startOf('day');
     const weekStart = moment(today).startOf('isoWeek');  // Monday as the start of the week
+    const weekEnd = moment(weekStart).endOf('isoWeek');  // Sunday as the end of the week
+    const currentMonthYear = moment().format('YYYY-MM');
+    const previousMonthYear = moment().subtract(1, 'month').format('YYYY-MM');
 
-    // Get user fitness data
-    const userFitness = await UserFitness.findOne({
+    // Get user fitness data for both current and previous month
+    const userFitnessData = await UserFitness.find({
       userId,
-      monthYear: moment().format('YYYY-MM')
+      monthYear: { $in: [currentMonthYear, previousMonthYear] }
     });
 
-    if (!userFitness) {
+    if (!userFitnessData || userFitnessData.length === 0) {
       return res.status(404).json({ message: 'User fitness data not found' });
     }
 
-    // console.log("User fitness data ===>", userFitness);
+    // Merge step history from both months
+    const mergedStepHistory = new Map();
+    userFitnessData.forEach(fitness => {
+      if (fitness.stepHistory) {
+        fitness.stepHistory.forEach((value, key) => {
+          mergedStepHistory.set(key, value);
+        });
+      }
+    });
 
     const weeklyGoalStatus = {};
-    const stepHistory = userFitness.stepHistory || new Map();
 
     // Loop through each day of the current week (Monday to Sunday)
     for (let i = 0; i < 7; i++) {
       const currentDate = moment(weekStart).add(i, 'days').format('DD/MM/YY');
       const dayName = moment(weekStart).add(i, 'days').format('dddd');  // Get day name (Monday, Tuesday, etc.)
 
-      if (stepHistory.has(currentDate)) {
+      if (mergedStepHistory.has(currentDate)) {
         // Get all step entries for the day
-        const dailySteps = stepHistory.get(currentDate);
+        const dailySteps = mergedStepHistory.get(currentDate);
         
         // Sum all walking and reward steps for the day
         const totalWalkingSteps = dailySteps.reduce((acc, entry) => acc + (entry.walkingSteps || 0), 0);
@@ -97,17 +107,30 @@ const generateEmptyWeekStatus = () => {
  const getUserStepStats = async (req, res) => {
   try {
     const { userId } = req.params;
+    const currentMonthYear = moment().format('YYYY-MM');
+    const previousMonthYear = moment().subtract(1, 'month').format('YYYY-MM');
 
-    // Get user fitness data
-    const userFitness = await UserFitness.findOne({ userId });
+    // Get user fitness data for both months
+    const userFitnessData = await UserFitness.find({
+      userId,
+      monthYear: { $in: [currentMonthYear, previousMonthYear] }
+    });
 
-    if (!userFitness) {
+    if (!userFitnessData || userFitnessData.length === 0) {
       return res.status(404).json({ message: 'User fitness data not found' });
     }
 
-    const stepHistory = userFitness.stepHistory || new Map();
-    console.log("stepHistory ===>", stepHistory);
-    const historyEntries = Array.from(stepHistory.entries());
+    // Merge step history from both months
+    const mergedStepHistory = new Map();
+    userFitnessData.forEach(fitness => {
+      if (fitness.stepHistory) {
+        fitness.stepHistory.forEach((value, key) => {
+          mergedStepHistory.set(key, value);
+        });
+      }
+    });
+
+    const historyEntries = Array.from(mergedStepHistory.entries());
 
     // Sort by date in ascending order
     historyEntries.sort(([dateA], [dateB]) => moment(dateA, 'DD/MM/YY').valueOf() - moment(dateB, 'DD/MM/YY').valueOf());
@@ -174,8 +197,9 @@ const generateEmptyWeekStatus = () => {
 
 const getUserLastNDaysData = async (req, res) => {
   try {
-    const { userId,days } = req.body;
- 
+    const { userId, days } = req.body;
+    const currentMonthYear = moment().format('YYYY-MM');
+    const previousMonthYear = moment().subtract(1, 'month').format('YYYY-MM');
 
     if (!userId) {
       return res.status(400).json({ message: 'Invalid User ID' });
@@ -189,22 +213,33 @@ const getUserLastNDaysData = async (req, res) => {
     const today = moment().startOf('day');
     const startDate = moment(today).subtract(numberOfDays - 1, 'days');
 
-    const userFitness = await UserFitness.findOne({ userId });
+    const userFitnessData = await UserFitness.find({
+      userId,
+      monthYear: { $in: [currentMonthYear, previousMonthYear] }
+    });
 
-    if (!userFitness) {
+    if (!userFitnessData || userFitnessData.length === 0) {
       return res.status(404).json({ message: 'User fitness data not found' });
     }
 
-    const stepHistory = userFitness.stepHistory || {};
-    
+    // Merge step history from both months
+    const mergedStepHistory = new Map();
+    userFitnessData.forEach(fitness => {
+      if (fitness.stepHistory) {
+        fitness.stepHistory.forEach((value, key) => {
+          mergedStepHistory.set(key, value);
+        });
+      }
+    });
+
     const stepData = [];
     
     // Loop through the last N days
     for (let i = 0; i < numberOfDays; i++) {
       const date = moment(startDate).add(i, 'days').format('DD/MM/YY');
       
-      if (stepHistory.has(date)) {
-        const dayData = stepHistory.get(date);
+      if (mergedStepHistory.has(date)) {
+        const dayData = mergedStepHistory.get(date);
         
         const totalWalkingSteps = dayData.reduce((acc, record) => acc + record.walkingSteps, 0);
         const totalRewardSteps = dayData.reduce((acc, record) => acc + record.rewardSteps, 0);
@@ -240,23 +275,35 @@ const getUserLastNDaysData = async (req, res) => {
 const getWeeklyDayWiseData = async (req, res) => {
   try {
     const { userId } = req.body;
+    const currentMonthYear = moment().format('YYYY-MM');
+    const previousMonthYear = moment().subtract(1, 'month').format('YYYY-MM');
 
     if (!userId) {
       return res.status(400).json({ message: 'Invalid User ID' });
     }
 
     const today = moment().startOf('day');
-    const weekStart = moment(today).startOf('isoWeek'); // Start of the week (Monday)
-    const weekEnd = moment(weekStart).endOf('isoWeek'); // End of the week (Sunday)
+    const weekStart = moment(today).startOf('isoWeek');
+    const weekEnd = moment(weekStart).endOf('isoWeek');
 
-    // Fetch user fitness data
-    const userFitness = await UserFitness.findOne({ userId });
+    const userFitnessData = await UserFitness.find({
+      userId,
+      monthYear: { $in: [currentMonthYear, previousMonthYear] }
+    });
 
-    if (!userFitness) {
+    if (!userFitnessData || userFitnessData.length === 0) {
       return res.status(404).json({ message: 'User fitness data not found' });
     }
 
-    const stepHistory = userFitness.stepHistory || new Map();
+    // Merge step history from both months
+    const mergedStepHistory = new Map();
+    userFitnessData.forEach(fitness => {
+      if (fitness.stepHistory) {
+        fitness.stepHistory.forEach((value, key) => {
+          mergedStepHistory.set(key, value);
+        });
+      }
+    });
 
     // Initialize day-wise data
     const dayWiseData = {
@@ -282,8 +329,8 @@ const getWeeklyDayWiseData = async (req, res) => {
       const dayName = moment(weekStart).add(i, 'days').format('dddd'); // Get day name (Monday, Tuesday, etc.)
 
       // Get step data for the day
-      if (stepHistory.has(currentDate)) {
-        const dayData = stepHistory.get(currentDate);
+      if (mergedStepHistory.has(currentDate)) {
+        const dayData = mergedStepHistory.get(currentDate);
 
         // Sum up reward steps for the day
         const totalRewardSteps = dayData.reduce((acc, record) => acc + (record.rewardSteps || 0), 0);

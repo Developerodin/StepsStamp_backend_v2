@@ -7,34 +7,46 @@ import moment from 'moment';
  */
 const getUserStepData = async (userId, date, monthYear) => {
   const currentMonth = monthYear || moment().format('YYYY-MM'); // Default to current month
+  const previousMonth = moment(currentMonth).subtract(1, 'month').format('YYYY-MM');
   const formattedDate = date ? moment(date, 'YYYY-MM-DD').format('DD/MM/YY') : null; // Ensure correct format
   const currentDate = moment().format('DD/MM/YY'); // Get current date
 
-  // Find user fitness data for the given month
-  const userFitness = await UserFitness.findOne({ userId, monthYear: currentMonth }).lean(); 
+  // Find user fitness data for both current and previous month
+  const userFitnessData = await UserFitness.find({ 
+    userId, 
+    monthYear: { $in: [currentMonth, previousMonth] }
+  }).lean();
 
-  if (!userFitness) {
+  if (!userFitnessData || userFitnessData.length === 0) {
     return { message: 'No step data found for the given period' };
   }
 
+  // Merge step history from both months
+  const mergedStepHistory = {};
+  userFitnessData.forEach(fitness => {
+    if (fitness.stepHistory) {
+      Object.assign(mergedStepHistory, fitness.stepHistory);
+    }
+  });
+
   if (formattedDate) {
-    // ✅ Return stepHistory for the specific date
+    // Return stepHistory for the specific date
     return {
       date: formattedDate,
-      steps: userFitness.stepHistory[formattedDate] || [],
+      steps: mergedStepHistory[formattedDate] || [],
     };
   }
 
   // Get current date's step data
-  const currentDateSteps = userFitness.stepHistory[currentDate] || [];
+  const currentDateSteps = mergedStepHistory[currentDate] || [];
   const currentDateData = currentDateSteps[0] || { walkingSteps: 0, rewardSteps: 0 };
 
-  // ✅ Return entire month's step data with current date's steps
+  // Return entire merged step history with current date's steps
   return {
     monthYear: currentMonth,
     dailyWalkingSteps: currentDateData.walkingSteps,
     dailyRewardSteps: currentDateData.rewardSteps,
-    stepHistory: userFitness.stepHistory,
+    stepHistory: mergedStepHistory,
   };
 };
 
